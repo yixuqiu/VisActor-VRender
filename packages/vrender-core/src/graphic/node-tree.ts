@@ -181,7 +181,7 @@ export class Node extends EventEmitter<any, any> implements INode {
     if (!referenceNode) {
       return this.appendChild(newNode);
     }
-    if (this._uid === newNode._uid) {
+    if (this === newNode || newNode === referenceNode) {
       return null;
     }
     if (newNode.isAncestorsOf(this)) {
@@ -225,7 +225,7 @@ export class Node extends EventEmitter<any, any> implements INode {
     if (!referenceNode) {
       return this.appendChild(newNode);
     }
-    if (this._uid === newNode._uid) {
+    if (this === newNode || newNode === referenceNode) {
       return null;
     }
     if (newNode.isAncestorsOf(this)) {
@@ -272,7 +272,7 @@ export class Node extends EventEmitter<any, any> implements INode {
     if (idx >= this.childrenCount) {
       return this.appendChild(newNode);
     }
-    if (this._uid === newNode._uid) {
+    if (this === newNode) {
       return null;
     }
     if (newNode.isAncestorsOf(this)) {
@@ -369,7 +369,7 @@ export class Node extends EventEmitter<any, any> implements INode {
     if (this._nodeList) {
       // 找到idx
       const idx = this._nodeList.findIndex(n => n === child);
-      if (idx > 0) {
+      if (idx >= 0) {
         this._nodeList.splice(idx, 1);
       }
     }
@@ -411,6 +411,9 @@ export class Node extends EventEmitter<any, any> implements INode {
   removeAllChild(deep?: boolean) {
     if (!this._idMap) {
       return;
+    }
+    if (this._nodeList) {
+      this._nodeList.length = 0;
     }
     let child = this._firstChild;
     while (child) {
@@ -699,7 +702,7 @@ export class Node extends EventEmitter<any, any> implements INode {
   setAllDescendantsProps(propsName: string, propsValue: any) {
     let child = this._firstChild;
     while (child) {
-      child[propsName] = propsValue;
+      (child as any)[propsName] = propsValue;
       child.setAllDescendantsProps(propsName, propsValue);
       child = child._next;
     }

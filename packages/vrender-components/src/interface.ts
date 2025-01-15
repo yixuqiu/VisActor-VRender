@@ -1,4 +1,4 @@
-import type { IRectGraphicAttribute } from '@visactor/vrender-core';
+import type { ICustomPath2D, IGraphicAttribute, IGroup, IRectGraphicAttribute } from '@visactor/vrender-core';
 
 export type Direction = 'horizontal' | 'vertical';
 
@@ -9,6 +9,11 @@ export type BackgroundAttributes = {
    * 是否绘制背景层
    */
   visible: boolean;
+  /**
+   * 自定义路径
+   * @since 0.19.19
+   */
+  customShape?: (container: IGroup, attrs: Partial<IGraphicAttribute>, path: ICustomPath2D) => ICustomPath2D;
 } & Partial<IRectGraphicAttribute>;
 
 export type IDelayType = 'debounce' | 'throttle';

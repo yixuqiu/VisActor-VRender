@@ -12,7 +12,8 @@ import type {
   IGraphicRenderDrawParams,
   IContributionProvider
 } from '../../../interface';
-import { getModelMatrix, getTheme, multiplyMat4Mat4 } from '../../../graphic';
+import { getTheme } from '../../../graphic/theme';
+import { getModelMatrix } from '../../../graphic/graphic-service/graphic-service';
 import { isArray } from '@visactor/vutils';
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import { ContributionProvider } from '../../../common/contribution-provider';
@@ -23,6 +24,7 @@ import { mat4Allocate } from '../../../allocator/matrix-allocate';
 import { GROUP_NUMBER_TYPE } from '../../../graphic/constants';
 import { BaseRenderContributionTime } from '../../../common/enums';
 import { defaultGroupBackgroundRenderContribution } from './contributions';
+import { multiplyMat4Mat4 } from '../../../common/matrix';
 
 @injectable()
 export class DefaultCanvasGroupRender implements IGraphicRender {
@@ -70,7 +72,11 @@ export class DefaultCanvasGroupRender implements IGraphicRender {
       cornerRadius = groupAttribute.cornerRadius,
       path = groupAttribute.path,
       lineWidth = groupAttribute.lineWidth,
-      visible = groupAttribute.visible
+      visible = groupAttribute.visible,
+      fillStrokeOrder = groupAttribute.fillStrokeOrder,
+
+      x: originX = groupAttribute.x,
+      y: originY = groupAttribute.y
     } = group.attribute;
 
     // 不绘制或者透明
@@ -158,21 +164,34 @@ export class DefaultCanvasGroupRender implements IGraphicRender {
     // shadow
     context.setShadowBlendStyle && context.setShadowBlendStyle(group, group.attribute, groupAttribute);
 
-    if (doFillOrStroke.doFill) {
-      if (fillCb) {
-        fillCb(context, group.attribute, groupAttribute);
-      } else if (fVisible) {
-        context.setCommonStyle(group, group.attribute, x, y, groupAttribute);
-        context.fill();
+    const _runFill = () => {
+      if ((doFillOrStroke as any).doFill) {
+        if (fillCb) {
+          fillCb(context, group.attribute, groupAttribute);
+        } else if (fVisible) {
+          context.setCommonStyle(group, group.attribute, originX - x, originY - y, groupAttribute);
+          context.fill();
+        }
       }
-    }
-    if (doFillOrStroke.doStroke) {
-      if (strokeCb) {
-        strokeCb(context, group.attribute, groupAttribute);
-      } else if (sVisible) {
-        context.setStrokeStyle(group, group.attribute, x, y, groupAttribute);
-        context.stroke();
+    };
+
+    const _runStroke = () => {
+      if ((doFillOrStroke as any).doStroke) {
+        if (strokeCb) {
+          strokeCb(context, group.attribute, groupAttribute);
+        } else if (sVisible) {
+          context.setStrokeStyle(group, group.attribute, originX - x, originY - y, groupAttribute);
+          context.stroke();
+        }
       }
+    };
+
+    if (!fillStrokeOrder) {
+      _runFill();
+      _runStroke();
+    } else {
+      _runStroke();
+      _runFill();
     }
 
     this._groupRenderContribitions.forEach(c => {
@@ -202,12 +221,14 @@ export class DefaultCanvasGroupRender implements IGraphicRender {
       return;
     }
     // debugger;
-    const { clip } = group.attribute;
+    const { clip, baseOpacity = 1 } = group.attribute;
     if (clip) {
       context.save();
     } else {
       context.highPerformanceSave();
     }
+    const baseGlobalAlpha = context.baseGlobalAlpha;
+    context.baseGlobalAlpha *= baseOpacity;
 
     const groupAttribute = getTheme(group, params?.theme).group;
 
@@ -280,6 +301,8 @@ export class DefaultCanvasGroupRender implements IGraphicRender {
       mat4Allocate.free(context.modelMatrix);
     }
     context.modelMatrix = lastModelMatrix;
+
+    context.baseGlobalAlpha = baseGlobalAlpha;
 
     if (p && p.then) {
       p.then(() => {

@@ -1,4 +1,4 @@
-import type { IAABBBounds, IBounds, IBoundsLike, IMatrix, AABBBounds } from '@visactor/vutils';
+import type { IAABBBounds, IBounds, IBoundsLike, IMatrix } from '@visactor/vutils';
 import { Bounds, Point, isString } from '@visactor/vutils';
 import type {
   IGraphic,
@@ -31,24 +31,21 @@ import type { Layer } from './layer';
 import { EventSystem } from '../event';
 import { container } from '../container';
 import { RenderService } from '../render';
-import { Group, Theme } from '../graphic';
+import { Group } from '../graphic/group';
+import { Theme } from '../graphic/theme';
 import { PickerService } from '../picker/constants';
 import { PluginService } from '../plugins/constants';
 import { AutoRenderPlugin } from '../plugins/builtin-plugin/auto-render-plugin';
-import { ViewTransform3dPlugin } from '../plugins/builtin-plugin/3dview-transform-plugin';
+import { AutoRefreshPlugin } from '../plugins/builtin-plugin/auto-refresh-plugin';
 import { IncrementalAutoRenderPlugin } from '../plugins/builtin-plugin/incremental-auto-render-plugin';
-import { HtmlAttributePlugin } from '../plugins/builtin-plugin/html-attribute-plugin';
 import { DirtyBoundsPlugin } from '../plugins/builtin-plugin/dirty-bounds-plugin';
-import { FlexLayoutPlugin } from '../plugins/builtin-plugin/flex-layout-plugin';
 import { defaultTicker } from '../animate/default-ticker';
 import { SyncHook } from '../tapable';
-import { DirectionalLight } from './light';
-import { OrthoCamera } from './camera';
 import { LayerService } from './constants';
 import { DefaultTimeline } from '../animate';
 import { application } from '../application';
 import { isBrowserEnv } from '../env-check';
-import { ReactAttributePlugin } from '../plugins/builtin-plugin/react-attribute-plugin';
+import { Factory } from '../factory';
 
 const DefaultConfig = {
   WIDTH: 500,
@@ -170,6 +167,7 @@ export class Stage extends Group implements IStage {
   ticker: ITicker;
 
   autoRender: boolean;
+  autoRefresh: boolean;
   _enableLayout: boolean;
   htmlAttribute: boolean | string | any;
   reactAttribute: boolean | string | any;
@@ -178,7 +176,7 @@ export class Stage extends Group implements IStage {
   readonly window: IWindow;
   private readonly global: IGlobal;
   readonly renderService: IRenderService;
-  pickerService?: IPickerService;
+  protected pickerService?: IPickerService;
   readonly pluginService: IPluginService;
   readonly layerService: ILayerService;
   private _eventSystem?: EventSystem;
@@ -198,6 +196,10 @@ export class Stage extends Group implements IStage {
   protected timeline: ITimeline;
 
   declare params: Partial<IStageParams>;
+
+  // 是否在render之前执行了tick，如果没有执行，尝试执行tick用来应用动画属性，避免动画过程中随意赋值然后又调用同步render导致属性的突变
+  // 第一次render不需要强行走动画
+  protected tickedBeforeRender: boolean = true;
 
   /**
    * 所有属性都具有默认值。
@@ -262,6 +264,9 @@ export class Stage extends Group implements IStage {
     if (params.autoRender) {
       this.enableAutoRender();
     }
+    if (params.autoRefresh) {
+      this.enableAutoRefresh();
+    }
     // 默认不开启dirtyBounds
     if (params.disableDirtyBounds === false) {
       this.enableDirtyBounds();
@@ -292,10 +297,11 @@ export class Stage extends Group implements IStage {
     if (params.background && isString(this._background) && this._background.includes('/')) {
       this.setAttributes({ background: this._background });
     }
+    this.ticker.on('afterTick', this.afterTickCb);
   }
 
-  pauseRender() {
-    this._skipRender = -1;
+  pauseRender(sr: number = -1) {
+    this._skipRender = sr;
   }
 
   resumeRender() {
@@ -410,7 +416,11 @@ export class Stage extends Group implements IStage {
       cameraZ = Math.cos(alpha) * Math.cos(beta) * z;
     }
 
-    this.light = new DirectionalLight(dir, color, ambient);
+    const DirectionalLight = Factory.getPlugin('DirectionalLight');
+
+    if (DirectionalLight) {
+      this.light = new DirectionalLight(dir, color, ambient);
+    }
     const cameraParams = {
       left: 0,
       right: this.width,
@@ -427,7 +437,10 @@ export class Stage extends Group implements IStage {
     if (this.camera) {
       this.camera.params = cameraParams;
     } else {
-      this.camera = new OrthoCamera(cameraParams);
+      const OrthoCamera = Factory.getPlugin('OrthoCamera');
+      if (OrthoCamera) {
+        this.camera = new OrthoCamera(cameraParams);
+      }
     }
 
     if (options.enableView3dTransform) {
@@ -444,6 +457,18 @@ export class Stage extends Group implements IStage {
     this._afterRender && this._afterRender(stage);
     this._afterNextRenderCbs && this._afterNextRenderCbs.forEach(cb => cb(stage));
     this._afterNextRenderCbs = null;
+    this.tickedBeforeRender = false;
+  };
+
+  protected afterTickCb = () => {
+    this.tickedBeforeRender = true;
+    // 性能模式不用立刻渲染
+    if (this.params.optimize?.tickRenderMode === 'performance') {
+      // do nothing
+    } else {
+      // 不是rendering的时候，render
+      this.state !== 'rendering' && this.render();
+    }
   };
 
   setBeforeRender(cb: (stage: IStage) => void) {
@@ -466,7 +491,11 @@ export class Stage extends Group implements IStage {
       return;
     }
     this.view3dTranform = true;
-    this.pluginService.register(new ViewTransform3dPlugin());
+    const ViewTransform3dPlugin = Factory.getPlugin('ViewTransform3dPlugin');
+
+    if (ViewTransform3dPlugin) {
+      this.pluginService.register(new ViewTransform3dPlugin());
+    }
   }
 
   disableView3dTranform() {
@@ -492,6 +521,22 @@ export class Stage extends Group implements IStage {
     }
     this.autoRender = false;
     this.pluginService.findPluginsByName('AutoRenderPlugin').forEach(plugin => {
+      this.pluginService.unRegister(plugin);
+    });
+  }
+  enableAutoRefresh() {
+    if (this.autoRefresh) {
+      return;
+    }
+    this.autoRefresh = true;
+    this.pluginService.register(new AutoRefreshPlugin());
+  }
+  disableAutoRefresh() {
+    if (!this.autoRefresh) {
+      return;
+    }
+    this.autoRefresh = false;
+    this.pluginService.findPluginsByName('AutoRefreshPlugin').forEach(plugin => {
       this.pluginService.unRegister(plugin);
     });
   }
@@ -538,7 +583,12 @@ export class Stage extends Group implements IStage {
       return;
     }
     this._enableLayout = true;
-    this.pluginService.register(new FlexLayoutPlugin());
+
+    const FlexLayoutPlugin = Factory.getPlugin('FlexLayoutPlugin');
+
+    if (FlexLayoutPlugin) {
+      this.pluginService.register(new FlexLayoutPlugin());
+    }
   }
   disableLayout() {
     if (!this._enableLayout) {
@@ -553,8 +603,12 @@ export class Stage extends Group implements IStage {
     if (this.htmlAttribute) {
       return;
     }
-    this.htmlAttribute = container;
-    this.pluginService.register(new HtmlAttributePlugin());
+    const HtmlAttributePlugin = Factory.getPlugin('HtmlAttributePlugin');
+
+    if (HtmlAttributePlugin) {
+      this.htmlAttribute = container;
+      this.pluginService.register(new HtmlAttributePlugin());
+    }
   }
   disableHtmlAttribute() {
     if (!this.htmlAttribute) {
@@ -569,8 +623,12 @@ export class Stage extends Group implements IStage {
     if (this.reactAttribute) {
       return;
     }
-    this.reactAttribute = container;
-    this.pluginService.register(new ReactAttributePlugin());
+    const ReactAttributePlugin = Factory.getPlugin('ReactAttributePlugin');
+
+    if (ReactAttributePlugin) {
+      this.reactAttribute = container;
+      this.pluginService.register(new ReactAttributePlugin());
+    }
   }
   disableReactAttribute() {
     if (!this.reactAttribute) {
@@ -599,7 +657,7 @@ export class Stage extends Group implements IStage {
   //   return layer.appendChild<T>(node);
   // }
 
-  protected tryUpdateAABBBounds(): AABBBounds {
+  protected tryUpdateAABBBounds(): IAABBBounds {
     const viewBox = this.window.getViewBox();
     this._AABBBounds.setValue(viewBox.x1, viewBox.y1, viewBox.x2, viewBox.y2);
     return this._AABBBounds;
@@ -611,6 +669,9 @@ export class Stage extends Group implements IStage {
   // 如果传入CanvasId，如果存在相同Id，说明这两个图层使用相同的Canvas绘制
   // 但需要注意的是依然是两个图层（用于解决Table嵌入ChartSpace不影响Table的绘制）
   createLayer(canvasId?: string, layerMode?: LayerMode): ILayer {
+    if (this.releaseStatus === 'released') {
+      return;
+    }
     // 创建一个默认layer图层
     const layer = this.layerService.createLayer(this, {
       main: false,
@@ -638,6 +699,9 @@ export class Stage extends Group implements IStage {
     return this.removeChild(this.findChildByUid(ILayerId) as IGraphic) as ILayer;
   }
   tryInitInteractiveLayer() {
+    if (this.releaseStatus === 'released') {
+      return;
+    }
     // TODO：顺序可能会存在问题
     // 支持交互层，且没有创建过，那就创建
     if (this.supportInteractiveLayer && !this.interactiveLayer) {
@@ -656,10 +720,17 @@ export class Stage extends Group implements IStage {
   }
 
   render(layers?: ILayer[], params?: Partial<IDrawContext>): void {
+    if (this.releaseStatus === 'released') {
+      return;
+    }
     this.ticker.start();
     this.timeline.resume();
     const state = this.state;
     this.state = 'rendering';
+    // 判断是否需要手动执行tick
+    if (!this.tickedBeforeRender) {
+      this.ticker.trySyncTickStatus();
+    }
     this.layerService.prepareStageLayer(this);
     if (!this._skipRender) {
       this.lastRenderparams = params;
@@ -676,6 +747,19 @@ export class Stage extends Group implements IStage {
   }
 
   protected combineLayersToWindow() {
+    // TODO 后续支持通用的渲染模型
+    if (this.global.env === 'harmony') {
+      const ctx = this.window.getContext().nativeContext;
+      this.forEachChildren<ILayer>((layer, i) => {
+        if (i > 0) {
+          const image = layer
+            .getNativeHandler()
+            .getContext()
+            .canvas.nativeCanvas.nativeCanvas._c.transferToImageBitmap();
+          ctx.transferFromImageBitmap(image);
+        }
+      });
+    }
     return;
     // this.forEach<ILayer>((layer, i) => {
     //   layer.combineTo(this.window, {
@@ -712,6 +796,9 @@ export class Stage extends Group implements IStage {
   }
 
   _doRenderInThisFrame() {
+    if (this.releaseStatus === 'released') {
+      return;
+    }
     this.timeline.resume();
     this.ticker.start();
     const state = this.state;
@@ -749,6 +836,10 @@ export class Stage extends Group implements IStage {
       }
       layer.renderCount = this.renderCount + 1;
 
+      if (layer === this.interactiveLayer) {
+        // 交互层由于其特殊性，不使用dirtyBounds
+        this.dirtyBounds && this.dirtyBounds.clear();
+      }
       layer.render(
         {
           renderService: this.renderService,
@@ -763,6 +854,8 @@ export class Stage extends Group implements IStage {
 
     // 添加交互层渲染
     if (this.interactiveLayer && !layerList.includes(this.interactiveLayer)) {
+      // 交互层由于其特殊性，不使用dirtyBounds
+      this.dirtyBounds && this.dirtyBounds.clear();
       this.interactiveLayer.render(
         {
           renderService: this.renderService,
@@ -787,6 +880,9 @@ export class Stage extends Group implements IStage {
    * @param rerender
    */
   resize(w: number, h: number, rerender: boolean = true): void {
+    if (this.releaseStatus === 'released') {
+      return;
+    }
     // 如果不是子图的stage，那么认为用户也想要resize view
     if (!this.window.hasSubView()) {
       this.viewBox.setValue(this.viewBox.x1, this.viewBox.y1, this.viewBox.x1 + w, this.viewBox.y1 + h);
@@ -801,6 +897,9 @@ export class Stage extends Group implements IStage {
     rerender && this.render();
   }
   resizeView(w: number, h: number, rerender: boolean = true) {
+    if (this.releaseStatus === 'released') {
+      return;
+    }
     this.viewBox.setValue(this.viewBox.x1, this.viewBox.y1, this.viewBox.x1 + w, this.viewBox.y1 + h);
     this.forEachChildren<ILayer>(c => {
       c.resizeView(w, h);
@@ -847,11 +946,11 @@ export class Stage extends Group implements IStage {
     throw new Error('暂不支持');
   }
   pick(x: number, y: number): PickResult | false {
-    if (!this.pickerService) {
-      this.pickerService = container.get<IPickerService>(PickerService);
+    if (this.releaseStatus === 'released') {
+      return;
     }
     // 暂时不提供layer的pick
-    const result = this.pickerService.pick(this.children as unknown as IGraphic[], new Point(x, y), {
+    const result = this.getPickerService().pick(this.children as unknown as IGraphic[], new Point(x, y), {
       bounds: this.AABBBounds
     });
     if (result?.graphic || result?.group) {
@@ -880,9 +979,17 @@ export class Stage extends Group implements IStage {
     this.forEach(layer => {
       layer.release();
     });
-    this.interactiveLayer && this.interactiveLayer.release();
+    // 额外删除掉interactiveLayer的节点
+    if (this.interactiveLayer) {
+      this.interactiveLayer.forEachChildren((item: IGraphic) => {
+        item.setStage && item.setStage(null, null);
+        this.interactiveLayer.removeChild(item);
+      });
+      this.interactiveLayer.release();
+    }
     this.window.release();
     this.ticker.remTimeline(this.timeline);
+    this.ticker.removeListener('afterTick', this.afterTickCb);
     this.renderService.renderTreeRoots = [];
   }
 
@@ -900,6 +1007,9 @@ export class Stage extends Group implements IStage {
    * @param matrix
    */
   dirty(b: IBounds, matrix?: IMatrix) {
+    if (this.releaseStatus === 'released') {
+      return;
+    }
     if (matrix) {
       b.transformWithMatrix(matrix);
     }
@@ -915,6 +1025,9 @@ export class Stage extends Group implements IStage {
   }
 
   renderTo(window: IWindow) {
+    if (this.releaseStatus === 'released') {
+      return;
+    }
     this.forEachChildren<ILayer>((layer, i) => {
       layer.drawTo(window, {
         // ...params,
@@ -934,6 +1047,9 @@ export class Stage extends Group implements IStage {
    * @returns
    */
   renderToNewWindow(fullImage: boolean = true, viewBox?: IAABBBounds): IWindow {
+    if (this.releaseStatus === 'released') {
+      return;
+    }
     const window = container.get<IWindow>(VWindow);
     const x1 = viewBox ? -viewBox.x1 : 0;
     const y1 = viewBox ? -viewBox.y1 : 0;
@@ -968,6 +1084,9 @@ export class Stage extends Group implements IStage {
   }
 
   toCanvas(fullImage: boolean = true, viewBox?: IAABBBounds): HTMLCanvasElement | null {
+    if (this.releaseStatus === 'released') {
+      return;
+    }
     const window = this.renderToNewWindow(fullImage, viewBox);
     const c = window.getNativeHandler();
     if (c.nativeCanvas) {
@@ -989,5 +1108,19 @@ export class Stage extends Group implements IStage {
     const point = this.global.mapToCanvasPoint(e, this.window.getContext().canvas.nativeCanvas);
 
     return this.stage.window.pointTransform(point.x, point.y);
+  }
+
+  pauseTriggerEvent() {
+    this._eventSystem && this._eventSystem.pauseTriggerEvent();
+  }
+  resumeTriggerEvent() {
+    this._eventSystem && this._eventSystem.resumeTriggerEvent();
+  }
+
+  getPickerService() {
+    if (!this.pickerService) {
+      this.pickerService = container.get<IPickerService>(PickerService);
+    }
+    return this.pickerService;
   }
 }

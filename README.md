@@ -31,7 +31,7 @@ VRender, not just a feature-rich visual rendering engine, but also a skillful an
 
 <div align="center">
 
-English| [简体中文](./README.zh-CN.md)
+English | [简体中文](./README.zh-CN.md) | [日本語](./README.ja-JP.md)
 
 </div>
 
@@ -127,7 +127,7 @@ st.defaultLayer.add(sy);
 
 # Contribution
 
-If you would like to contribute, please read the [Code of Conduct ](./CODE_OF_CONDUCT.md) and [ Guide](./CONTRIBUTING.zh-CN.md) first。
+If you would like to contribute, please read the [Code of Conduct ](./CODE_OF_CONDUCT.md) and [ Guide](./CONTRIBUTING.md) first。
 
 Small streams converge to make great rivers and seas!
 

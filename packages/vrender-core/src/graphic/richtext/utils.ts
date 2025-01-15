@@ -1,5 +1,8 @@
+import type { IBoundsLike } from '@visactor/vutils';
 import { application } from '../../application';
+import { createColor } from '../../common/canvas-utils';
 import type { IContext2d, ITextStyleParams, IRichTextParagraphCharacter } from '../../interface';
+import { DEFAULT_TEXT_FONT_FAMILY } from '../../constants';
 
 export const DIRECTION_KEY = {
   horizontal: {
@@ -24,7 +27,7 @@ export const DIRECTION_KEY = {
 
 const defaultFormatting = {
   fontSize: 16,
-  fontFamily: 'sans-serif',
+  fontFamily: DEFAULT_TEXT_FONT_FAMILY,
   fill: true,
   stroke: false,
   fontWeight: 'normal',
@@ -39,19 +42,8 @@ const nbsp = String.fromCharCode(160);
 export const regLetter = /\w|\(|\)|-/;
 const regPunctuation = /[.?!,;:/，。？！、；：]/;
 export const regFirstSpace = /\S/;
-// Applies the style of a run to the canvas context
-export function applyFillStyle(ctx: IContext2d, character: IRichTextParagraphCharacter) {
-  const fillStyle = (character && (character.fill as string)) || defaultFormatting.fill;
-  if (!fillStyle) {
-    ctx.globalAlpha = 0;
-    return;
-  }
 
-  const { fillOpacity = 1, opacity = 1 } = character;
-
-  ctx.globalAlpha = fillOpacity * opacity;
-  ctx.fillStyle = fillStyle as string;
-
+const setTextStyle = (ctx: IContext2d, character: IRichTextParagraphCharacter) => {
   let fontSize = character.fontSize || 16;
   switch (character.script) {
     case 'super':
@@ -66,8 +58,24 @@ export function applyFillStyle(ctx: IContext2d, character: IRichTextParagraphCha
     fontStyle: character.fontStyle || '',
     fontWeight: character.fontWeight || '',
     fontSize,
-    fontFamily: character.fontFamily || 'sans-serif'
+    fontFamily: character.fontFamily
   } as ITextStyleParams);
+};
+
+// Applies the style of a run to the canvas context
+export function applyFillStyle(ctx: IContext2d, character: IRichTextParagraphCharacter, b?: IBoundsLike) {
+  const fillStyle = (character && (character.fill as string)) || defaultFormatting.fill;
+  if (!fillStyle) {
+    ctx.globalAlpha = 0;
+    return;
+  }
+
+  const { fillOpacity = 1, opacity = 1 } = character;
+
+  ctx.globalAlpha = fillOpacity * opacity;
+  ctx.fillStyle = b ? createColor(ctx, fillStyle, { AABBBounds: b }) : (fillStyle as string);
+
+  setTextStyle(ctx, character);
 }
 
 export function applyStrokeStyle(ctx: IContext2d, character: IRichTextParagraphCharacter) {
@@ -83,22 +91,7 @@ export function applyStrokeStyle(ctx: IContext2d, character: IRichTextParagraphC
   ctx.lineWidth = character && typeof character.lineWidth === 'number' ? character.lineWidth : 1;
   ctx.strokeStyle = strokeStyle as string;
 
-  let fontSize = character.fontSize || 16;
-  switch (character.script) {
-    case 'super':
-    case 'sub':
-      fontSize *= 0.8;
-      break;
-  }
-
-  ctx.setTextStyle({
-    textAlign: 'left',
-    textBaseline: character.textBaseline || 'alphabetic',
-    fontStyle: character.fontStyle || '',
-    fontWeight: character.fontWeight || '',
-    fontSize,
-    fontFamily: character.fontFamily || 'sans-serif'
-  } as ITextStyleParams);
+  setTextStyle(ctx, character);
 }
 
 export function prepareContext(ctx: IContext2d) {
@@ -177,10 +170,10 @@ export function getStrByWithCanvas(
   // 测量从头到当前位置宽度以及从头到下一个字符位置宽度
   let index = guessIndex;
   let temp = desc.slice(0, index);
-  let tempWidth = Math.floor(textMeasure.measureText(temp, character).width);
+  let tempWidth = Math.floor(textMeasure.measureText(temp, character as any).width);
 
   let tempNext = desc.slice(0, index + 1);
-  let tempWidthNext = Math.floor(textMeasure.measureText(tempNext, character).width);
+  let tempWidthNext = Math.floor(textMeasure.measureText(tempNext, character as any).width);
 
   // 到当前位置宽度 < width && 到下一个字符位置宽度 > width时，认为找到准确阶段位置
   while (tempWidth > width || tempWidthNext <= width) {
@@ -199,10 +192,10 @@ export function getStrByWithCanvas(
     }
 
     temp = desc.slice(0, index);
-    tempWidth = Math.floor(textMeasure.measureText(temp, character).width);
+    tempWidth = Math.floor(textMeasure.measureText(temp, character as any).width);
 
     tempNext = desc.slice(0, index + 1);
-    tempWidthNext = Math.floor(textMeasure.measureText(tempNext, character).width);
+    tempWidthNext = Math.floor(textMeasure.measureText(tempNext, character as any).width);
   }
 
   // 处理特殊情况
@@ -213,7 +206,14 @@ export function getStrByWithCanvas(
   return index;
 }
 
-export function testLetter(string: string, index: number): number {
+/**
+ * 向前找到单词结尾处换行
+ * @param string
+ * @param index
+ * @param negativeWrongMatch 如果为true，那么如果无法匹配就会向后找到单词的结尾，否则就直接返回index
+ * @returns
+ */
+export function testLetter(string: string, index: number, negativeWrongMatch: boolean = false): number {
   let i = index;
   // 切分前后都是英文字母数字下划线，向前找到非英文字母处换行
   while (
@@ -224,7 +224,30 @@ export function testLetter(string: string, index: number): number {
     i--;
     // 无法满足所有条件，放弃匹配，直接截断，避免陷入死循环
     if (i <= 0) {
-      return index;
+      return negativeWrongMatch ? testLetter2(string, index) : index;
+    }
+  }
+  return i;
+}
+
+/**
+ * 向后找到单词结尾处换行
+ * @param string
+ * @param index
+ * @returns
+ */
+export function testLetter2(string: string, index: number) {
+  let i = index;
+  // 切分前后都是英文字母数字下划线，向前找到非英文字母处换行
+  while (
+    (regLetter.test(string[i - 1]) && regLetter.test(string[i])) ||
+    // 行首标点符号处理
+    regPunctuation.test(string[i])
+  ) {
+    i++;
+    // 无法满足所有条件，放弃匹配，直接截断，避免陷入死循环
+    if (i >= string.length) {
+      return i;
     }
   }
   return i;
@@ -285,7 +308,7 @@ export function measureTextCanvas(
   character: IRichTextParagraphCharacter
 ): { ascent: number; height: number; descent: number; width: number } {
   const textMeasure = application.graphicUtil.textMeasure;
-  const measurement = textMeasure.measureText(text, character) as TextMetrics;
+  const measurement = textMeasure.measureText(text, character as any) as TextMetrics;
   const result: { ascent: number; height: number; descent: number; width: number } = {
     ascent: 0,
     height: 0,

@@ -10,7 +10,7 @@ export interface ILoader {
 }
 
 // 环境定义
-export type EnvType = 'browser' | 'feishu' | 'tt' | 'taro' | 'node' | 'native' | 'lynx' | 'wx';
+export type EnvType = 'browser' | 'feishu' | 'tt' | 'taro' | 'node' | 'native' | 'lynx' | 'wx' | 'harmony';
 
 // 创建canvas需要的参数
 export interface ICreateCanvasParams {
@@ -119,6 +119,21 @@ export interface IEnvContribution
     loadState: 'success' | 'fail';
     data: Blob | null;
   }>;
+  // @since 0.21.3
+  /**
+   * 加载字体，参数对应Font类
+   * @param font 字体名
+   * @param source 数据源
+   * @param descriptors 其他描述
+   * @returns
+   */
+  loadFont: (
+    font: string,
+    source: string | BinaryData,
+    descriptors?: FontFaceDescriptors
+  ) => Promise<{
+    loadState: 'success' | 'fail';
+  }>;
 }
 
 export type IMiniAppEnvParams = {
@@ -151,6 +166,7 @@ export interface IEnvParamsMap {
   readonly native: any;
   readonly lynx: any;
   readonly wx: any;
+  readonly harmony: any;
 }
 
 export type CreateDOMParamsType = {
@@ -267,4 +283,6 @@ export interface IGlobal extends Omit<IEventElement, 'on' | 'off' | 'once' | 'em
   getElementTop: (dom: any, baseWindow?: boolean) => number;
   getElementLeft: (dom: any, baseWindow?: boolean) => number;
   getElementTopLeft: (dom: any, baseWindow?: boolean) => { top: number; left: number };
+
+  isImageAnonymous: boolean;
 }

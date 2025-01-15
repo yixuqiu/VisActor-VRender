@@ -4,10 +4,12 @@ group: graphic-path
 title: basic-path
 keywords: path
 order: 1-0
-cover: http://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/path-basic.jpeg
+cover: https://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/path-basic.jpeg
 ---
 
 # path 图元
+
+`Path`（路径）图元是用于绘制复杂形状和曲线的基本图形元素，广泛应用于计算机图形学、图形设计和数据可视化中。它通过定义一系列的线段和曲线来创建任意形状，具有灵活性和表现力。其语法和`svg`中的`path`标签保持一致
 
 ## 代码演示
 

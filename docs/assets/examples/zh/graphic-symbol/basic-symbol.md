@@ -4,10 +4,12 @@ group: graphic-symbol
 title: basic-symbol
 keywords: symbol
 order: 1-0
-cover: http://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/symbol-basic.png
+cover: https://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/symbol-basic.png
 ---
 
 # symbol 图元
+
+`symbol`图元的语法和`path`图元类似，但支持一些内置的形状，以及支持`size`来控制像素大小。
 
 ## 代码演示
 

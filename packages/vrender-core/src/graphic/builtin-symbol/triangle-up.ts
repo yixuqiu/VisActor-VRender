@@ -3,7 +3,7 @@ import type { IContext2d, SymbolType, ISymbolClass } from '../../interface';
 import { BaseSymbol } from './base';
 
 /**
- * 
+ *
  *Copyright 2010-2021 Mike Bostock
 
   Permission to use, copy, modify, and/or distribute this software for any purpose
@@ -21,15 +21,7 @@ import { BaseSymbol } from './base';
 // 借鉴自d3
 // https://github.com/d3/d3-shape/blob/main/src/symbol/triangle.js
 
-export function trianglUp(ctx: IContext2d, r: number, x: number, y: number) {
-  ctx.moveTo(x + r, r + y);
-  ctx.lineTo(x - r, r + y);
-  ctx.lineTo(x, y - r);
-  ctx.closePath();
-  return true;
-}
-
-export function trianglUpOffset(ctx: IContext2d, r: number, x: number, y: number, offset: number) {
+export function trianglUpOffset(ctx: IContext2d, r: number, x: number, y: number, offset: number = 0) {
   ctx.moveTo(x + r + offset * 2, r + y + offset);
   ctx.lineTo(x - r - offset * 2, r + y + offset);
   ctx.lineTo(x, y - r - offset * 2);
@@ -43,12 +35,12 @@ export class TriangleUpSymbol extends BaseSymbol implements ISymbolClass {
   pathStr: string = 'M0.5,0.5 L-0.5,0.5 L0,-0.5 Z';
 
   draw(ctx: IContext2d, size: number, x: number, y: number) {
-    const r = size / 2;
-    return trianglUp(ctx, r, x, y);
+    const r = this.parseSize(size) / 2;
+    return trianglUpOffset(ctx, r, x, y);
   }
 
   drawOffset(ctx: IContext2d, size: number, x: number, y: number, offset: number) {
-    const r = size / 2;
+    const r = this.parseSize(size) / 2;
     return trianglUpOffset(ctx, r, x, y, offset);
   }
 }

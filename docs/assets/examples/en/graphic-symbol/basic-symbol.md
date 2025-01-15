@@ -4,10 +4,12 @@ group: graphic-symbol
 title: basic-symbol
 keywords: symbol
 order: 1-0
-cover: http://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/symbol-basic.png
+cover: https://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/symbol-basic.png
 ---
 
 # symbol graphic
+
+The syntax of the `symbol` primitive is similar to the `path` primitive, but it supports some built-in shapes and also supports `size` to control the pixel size.
 
 ## code demo
 

@@ -2,227 +2,228 @@ import { createStage, createRichText, createGroup, createCircle, xul } from '@vi
 import { addShapesToStage, colorPools } from '../utils';
 
 // const urlPng = 'https://vega.github.io/images/idl-logo.png';
+// const svg =
+//   '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="6" fill="#FD9C87"></circle><circle opacity="0.6" cx="6" cy="6" r="1" stroke="white" stroke-width="2"></circle></svg>';
 const svg =
-  '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="6" fill="#FD9C87"></circle><circle opacity="0.6" cx="6" cy="6" r="1" stroke="white" stroke-width="2"></circle></svg>';
+  '<svg t="1706853751091" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4226" width="100" height="100"><path d="M533.333333 85.333333c-247.426667 0-448 200.573333-448 448s200.573333 448 448 448 448-200.573333 448-448-200.573333-448-448-448z m0 853.333334c-223.86 0-405.333333-181.473333-405.333333-405.333334s181.473333-405.333333 405.333333-405.333333 405.333333 181.473333 405.333334 405.333333-181.473333 405.333333-405.333334 405.333334z m21.333334-192a21.333333 21.333333 0 1 1-21.333334-21.333334 21.333333 21.333333 0 0 1 21.333334 21.333334z m-21.333334-85.333334a21.333333 21.333333 0 0 1-21.333333-21.333333v-42.666667a21.333333 21.333333 0 0 1 6.246667-15.086666c13.1-13.093333 28.9-24.886667 45.633333-37.333334C601.333333 516.966667 640 488.1 640 448c0-58.813333-47.853333-106.666667-106.666667-106.666667s-106.666667 47.853333-106.666666 106.666667a21.333333 21.333333 0 0 1-42.666667 0 149.333333 149.333333 0 0 1 298.666667 0c0 28.113333-10.6 53.873333-32.406667 78.74-17.593333 20.046667-39.593333 36.466667-60.873333 52.34-12.666667 9.453333-24.76 18.473333-34.72 27.433333V640a21.333333 21.333333 0 0 1-21.333334 21.333333z" fill="#5C5C66" p-id="4227"></path></svg>';
 
 export const page = () => {
   const shapes = [];
 
-  shapes.push(
-    createRichText({
-      visible: true,
-      fontSize: 26,
-      width: 0,
-      background: 'green',
-      // "textAlign": "center",
-      textConfig: [
-        {
-          text: '我',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '们',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '是',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '无',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '缘',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '无',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '故',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '的',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '尘',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '埃\n',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '无',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '缘',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '无',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '故',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '的',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '游',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '走\n',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '黑',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '暗',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '只',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '需',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '要',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '张',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '开',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '一',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '张',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '缝',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '隙\n',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '就',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '能',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '挂',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '起',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '飓',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        },
-        {
-          text: '风\n',
-          fontSize: 26,
-          textAlign: 'center',
-          fill: '#0f51b5'
-        }
-      ]
-    })
-  );
+  const r = createRichText({
+    visible: true,
+    fontSize: 26,
+    width: 0,
+    background: 'green',
+    fill: 'linear-gradient(45deg, red 0%, green 100%)',
+    stroke: 'green',
+    // "textAlign": "center",
+    textConfig: [
+      {
+        text: '我',
+        fontSize: 26,
+        textAlign: 'center'
+      },
+      {
+        text: '们',
+        fontSize: 26,
+        textAlign: 'center'
+      },
+      {
+        text: '是',
+        fontSize: 26,
+        textAlign: 'center'
+      },
+      {
+        text: '无',
+        fontSize: 26,
+        textAlign: 'center'
+      },
+      {
+        text: '缘',
+        fontSize: 26,
+        textAlign: 'center'
+      },
+      {
+        text: '无',
+        fontSize: 26,
+        textAlign: 'center'
+      },
+      {
+        text: '故',
+        fontSize: 26,
+        textAlign: 'center'
+      },
+      {
+        text: '的',
+        fontSize: 26,
+        textAlign: 'center'
+      },
+      {
+        text: '尘',
+        fontSize: 26,
+        textAlign: 'center'
+      },
+      {
+        text: '埃\n',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '无',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '缘',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '无',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '故',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '的',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '游',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '走\n',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '黑',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '暗',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '只',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '需',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '要',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '张',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '开',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '一',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '张',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '缝',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '隙\n',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '就',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '能',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '挂',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '起',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '飓',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      },
+      {
+        text: '风\n',
+        fontSize: 26,
+        textAlign: 'center',
+        fill: '#0f51b5'
+      }
+    ]
+  });
+  shapes.push(r);
+  let angle = 0;
+  r.animate().to({ stroke: 'pink' }, 10000, 'linear');
+  // .onFrame(() => {
+  //   angle += 0.01;
+  //   console.log(angle);
+  //   r.setAttributes({ fill: `linear-gradient(${angle}deg, red 0%, green 100%)` });
+  // });
 
   shapes.push(
     createRichText({
@@ -306,6 +307,64 @@ export const page = () => {
       ]
     })
   );
+
+  shapes.push(
+    createRichText({
+      x: 400,
+      y: 50,
+      width: 300,
+      height: 300,
+      textConfig: [
+        {
+          text: 'ID',
+          fontFamily: 'Arial,sans-serif',
+          fontSize: 16,
+          fontWeight: 'bold',
+          fill: '#000',
+          stroke: false,
+          textAlign: 'left',
+          textBaseline: 'middle',
+          lineHeight: 16,
+          ellipsis: '...'
+        },
+        {
+          image:
+            '<svg t="1706853751091" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4226" width="100" height="100"><path d="M533.333333 85.333333c-247.426667 0-448 200.573333-448 448s200.573333 448 448 448 448-200.573333 448-448-200.573333-448-448-448z m0 853.333334c-223.86 0-405.333333-181.473333-405.333333-405.333334s181.473333-405.333333 405.333333-405.333333 405.333333 181.473333 405.333334 405.333333-181.473333 405.333333-405.333334 405.333334z m21.333334-192a21.333333 21.333333 0 1 1-21.333334-21.333334 21.333333 21.333333 0 0 1 21.333334 21.333334z m-21.333334-85.333334a21.333333 21.333333 0 0 1-21.333333-21.333333v-42.666667a21.333333 21.333333 0 0 1 6.246667-15.086666c13.1-13.093333 28.9-24.886667 45.633333-37.333334C601.333333 516.966667 640 488.1 640 448c0-58.813333-47.853333-106.666667-106.666667-106.666667s-106.666667 47.853333-106.666666 106.666667a21.333333 21.333333 0 0 1-42.666667 0 149.333333 149.333333 0 0 1 298.666667 0c0 28.113333-10.6 53.873333-32.406667 78.74-17.593333 20.046667-39.593333 36.466667-60.873333 52.34-12.666667 9.453333-24.76 18.473333-34.72 27.433333V640a21.333333 21.333333 0 0 1-21.333334 21.333333z" fill="#5C5C66" p-id="4227"></path></svg>',
+          visibleTime: 'always',
+          id: 'question',
+          width: 14,
+          height: 14,
+          margin: [0, 6, 0, 6],
+          cursor: 'pointer',
+          tooltip: {
+            style: {
+              arrowMark: false,
+              maxWidth: 200
+            },
+            title:
+              'this is tooltip content很多文字是思考和弗雷斯科货到付款就水电费就开始思考拉多加湖弗兰克撒娇划分空间里说货到付款就水电费快结束的反馈content很多文字是思考和弗雷斯科货到付款就水电费就开始思考拉多加湖弗兰克撒娇划分空间里说货到付款就水电费快结束的反馈content很多文字是思考和弗雷斯科货到付款就水电费就开始思考拉多加湖弗兰克撒娇划分空间里说货到付款就水电费快结束的反馈content很多文字是思考和弗雷斯科货到付款就水电费就开始思考拉多加湖弗兰克撒娇划分空间里说货到付款就水电费快结束的反馈content很多文字是思考和弗雷斯科货到付款就水电费就开始思考拉多加湖弗兰克撒娇划分空间里说货到付款就水电费快结束的反馈content很多文字是思考和弗雷斯科货到付款就水电费就开始思考拉多加湖弗兰克撒娇划分空间里说货到付款就水电费快结束的反馈',
+            placement: 'bottom'
+          },
+          backgroundWidth: 14,
+          backgroundHeight: 14,
+          backgroundShowMode: 'hover'
+        },
+        {
+          text: 'ID',
+          fontFamily: 'Arial,sans-serif',
+          fontSize: 16,
+          fontWeight: 'bold',
+          fill: '#000',
+          stroke: false,
+          textAlign: 'left',
+          textBaseline: 'middle',
+          lineHeight: 16,
+          ellipsis: '...'
+        }
+      ]
+    })
+  );
+  shapes[shapes.length - 1].bindIconEvent();
 
   shapes.push(
     createRichText({
@@ -901,6 +960,52 @@ export const page = () => {
     })
   );
 
+  const rt = createRichText({
+    fontSize: 14,
+    fill: '#FFC400',
+    fontFamily:
+      'PingFang SC,Helvetica Neue,Microsoft Yahei,system-ui,-apple-system,segoe ui,Roboto,Helvetica,Arial,sans-serif,apple color emoji,segoe ui emoji,segoe ui symbol',
+    textAlign: 'center',
+    textBaseline: 'middle',
+    boundsPadding: [10, 0, 10, 0],
+    fontWeight: 'normal',
+    fillOpacity: 1,
+    ellipsis: true,
+    pickable: true,
+    lineJoin: 'bevel',
+    stroke: '#ffffff',
+    _debug_bounds: true,
+    zIndex: -1,
+    // maxLineWidth: 200,
+    disableAutoWrapLine: true,
+    x: 100,
+    y: 100,
+    angle: 0,
+    // lineWidth: 0,
+    textConfig: [
+      {
+        text: '空值0\n',
+        fontSize: 12,
+        textAlign: 'left',
+        fill: '#1F2329'
+      },
+      {
+        text: '8%',
+        fontSize: 12,
+        textAlign: 'left',
+        fill: '#646A73'
+      }
+    ],
+    z: 0,
+    // width: 30,
+    width: 31,
+    // width: 0,
+    height: 80
+    // maxWidth: 200
+  });
+
+  console.log(rt);
+
   const stage = createStage({
     canvas: 'main',
     width: 1200,
@@ -922,6 +1027,55 @@ export const page = () => {
   //   `<image attribute="image: ${svg
   //     .replaceAll("'", "\\'")
   //     .replaceAll('"', '\\"')}; width: 30; height: 30; id: circle-0" />`
+  // );
+
+  // shapes.length = 0;
+
+  shapes.push(rt);
+
+  // shapes.push(
+  //   createRichText({
+  //     fontSize: 14,
+  //     fill: '#FF8A00',
+  //     fontFamily:
+  //       'PingFang SC,Helvetica Neue,Microsoft Yahei,system-ui,-apple-system,segoe ui,Roboto,Helvetica,Arial,sans-serif,apple color emoji,segoe ui emoji,segoe ui symbol',
+  //     textAlign: 'center',
+  //     textBaseline: 'middle',
+  //     boundsPadding: [-1, 0, -1, 0],
+  //     visible: true,
+  //     fontWeight: 'normal',
+  //     fillOpacity: 1,
+  //     pickable: false,
+  //     lineJoin: 'bevel',
+  //     stroke: '#ffffff',
+  //     width: 50,
+  //     height: 40,
+  //     ellipsis: true,
+  //     disableAutoWrapLine: true,
+  //     x: 446.334013251786,
+  //     y: 198.39408125844088,
+  //     angle: 0,
+  //     lineWidth: 0,
+  //     textConfig: [
+  //       {
+  //         text: 'aluminum1111111111111\n',
+  //         fontSize: 14,
+  //         fontWeight: 'bold',
+  //         fill: 'red'
+  //       },
+  //       {
+  //         text: '1.13%',
+  //         fontSize: 14,
+  //         lineThrough: true,
+  //         underline: true,
+  //         fill: 'green'
+  //       }
+  //     ],
+  //     z: 0,
+  //     id: 'vrender-component-arc-label-2',
+  //     opacity: 1,
+  //     strokeOpacity: 1
+  //   })
   // );
 
   addShapesToStage(stage, shapes as any, true);

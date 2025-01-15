@@ -15,8 +15,8 @@ export class LynxContext2d extends BrowserContext2d implements IContext2d {
     return this._globalAlpha;
   }
   set globalAlpha(ga: number) {
-    this.nativeContext.globalAlpha = ga;
-    this._globalAlpha = ga;
+    this.nativeContext.globalAlpha = ga * this.baseGlobalAlpha;
+    this._globalAlpha = ga * this.baseGlobalAlpha;
   }
 
   setLineDash(segments: number[]) {
@@ -53,10 +53,11 @@ export class LynxContext2d extends BrowserContext2d implements IContext2d {
         lineJoin = defaultParams.lineJoin,
         lineDash = defaultParams.lineDash,
         lineCap = defaultParams.lineCap,
-        miterLimit = defaultParams.miterLimit
+        miterLimit = defaultParams.miterLimit,
+        keepStrokeScale = defaultParams.keepStrokeScale
       } = attribute;
-      _context.globalAlpha = strokeOpacity * opacity;
-      _context.lineWidth = getScaledStroke(this, lineWidth, this.dpr);
+      _context.globalAlpha = strokeOpacity * opacity * this.baseGlobalAlpha;
+      _context.lineWidth = keepStrokeScale ? lineWidth : getScaledStroke(this, lineWidth, this.dpr);
       _context.strokeStyle = createColor(this, stroke as any, params, offsetX, offsetY);
       _context.lineJoin = lineJoin;
       // lynx环境中lineDash不能为[0, 0]
@@ -73,8 +74,15 @@ export class LynxContext2d extends BrowserContext2d implements IContext2d {
     method: 'native' | 'simple' | 'quick' = application.global.measureTextMethod
   ): { width: number } {
     this.setTransform(1, 0, 0, 1, 0, 0, true, application.global.devicePixelRatio);
-    const data = super.measureText(text, method);
-    return data;
+    const data: any = super.measureText(text, method);
+    // lynx环境中的fontBoundingBoxDescent和fontBoundingBoxAscent有严重偏移，暂时规避
+    return {
+      width: data.width,
+      fontBoundingBoxDescent: undefined,
+      fontBoundingBoxAscent: undefined,
+      actualBoundingBoxAscent: undefined,
+      actualBoundingBoxDescent: undefined
+    } as any;
   }
 
   createPattern(image: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement, repetition: string): CanvasPattern {

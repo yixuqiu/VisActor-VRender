@@ -49,36 +49,25 @@ export class MarkArea extends Marker<MarkAreaAttrs, CommonMarkAreaAnimationType>
 
   protected getPointAttrByPosition(position: IMarkAreaLabelPosition) {
     const { x1, x2, y1, y2 } = this._area.AABBBounds;
-
-    if (position.includes('left') || position.includes('Left')) {
-      return {
-        x: x1,
-        y: (y1 + y2) / 2
-      };
-    }
-    if (position.includes('right') || position.includes('Right')) {
-      return {
-        x: x2,
-        y: (y1 + y2) / 2
-      };
-    }
-    if (position.includes('top') || position.includes('Top')) {
-      return {
-        x: (x1 + x2) / 2,
-        y: y1
-      };
-    }
-    if (position.includes('bottom') || position.includes('Bottom')) {
-      return {
-        x: (x1 + x2) / 2,
-        y: y2
-      };
-    }
-
-    return {
+    const result = {
       x: (x1 + x2) / 2,
       y: (y1 + y2) / 2
     };
+
+    if (position.includes('left') || position.includes('Left')) {
+      result.x = x1;
+    }
+    if (position.includes('right') || position.includes('Right')) {
+      result.x = x2;
+    }
+    if (position.includes('top') || position.includes('Top')) {
+      result.y = y1;
+    }
+    if (position.includes('bottom') || position.includes('Bottom')) {
+      result.y = y2;
+    }
+
+    return result;
   }
 
   protected setLabelPos() {
@@ -131,18 +120,23 @@ export class MarkArea extends Marker<MarkAreaAttrs, CommonMarkAreaAnimationType>
   }
 
   protected updateMarker() {
-    const { points, label, areaStyle } = this.attribute as MarkAreaAttrs;
+    const { points, label, areaStyle, state } = this.attribute as MarkAreaAttrs;
     if (this._area) {
       this._area.setAttributes({
         points: points,
         ...areaStyle
       });
+      this._area.states = merge({}, DEFAULT_STATES, state?.area);
     }
-    if (this._area) {
+    if (this._label) {
       this._label.setAttributes({
         dx: 0,
         dy: 0, // 需要进行复位
-        ...(label as TagAttributes)
+        ...(label as TagAttributes),
+        state: {
+          panel: merge({}, DEFAULT_STATES, state?.labelBackground),
+          text: merge({}, DEFAULT_STATES, state?.label)
+        }
       });
     }
     this.setLabelPos();

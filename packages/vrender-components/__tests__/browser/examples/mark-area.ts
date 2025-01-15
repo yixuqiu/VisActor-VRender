@@ -130,7 +130,7 @@ export function run() {
   const stage = render(markAreas, 'main');
 
   setTimeout(() => {
-    markArea.release();
+    // markArea.release();
   }, 500);
 
   const gui = new GUI();
@@ -145,7 +145,15 @@ export function run() {
       'insideLeft',
       'insideRight',
       'insideTop',
-      'insideBottom'
+      'insideBottom',
+      'topLeft',
+      'topRight',
+      'bottomLeft',
+      'bottomRight',
+      'insideTopLeft',
+      'insideTopRight',
+      'insideBottomLeft',
+      'insideBottomRight'
     ])
     .onChange(value => {
       markAreas.forEach(markArea =>

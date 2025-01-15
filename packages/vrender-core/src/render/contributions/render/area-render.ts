@@ -7,34 +7,23 @@ import type {
   IAreaGraphicAttribute,
   IGraphicAttribute,
   IContext2d,
-  ICurveType,
   IMarkAttribute,
   IThemeAttribute,
   ISegPath2D,
-  IDirection,
   IAreaRenderContribution,
   IDrawContext,
   IRenderService,
   IGraphicRender,
   IGraphicRenderDrawParams,
-  IContributionProvider,
-  IStrokeType
+  IContributionProvider
 } from '../../../interface';
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import { ContributionProvider } from '../../../common/contribution-provider';
-import {
-  genLinearSegments,
-  genBasisSegments,
-  genMonotoneXSegments,
-  genMonotoneYSegments,
-  genStepSegments,
-  genLinearClosedSegments
-} from '../../../common/segment';
+import { calcLineCache } from '../../../common/segment';
 
 import { getTheme } from '../../../graphic/theme';
-import { drawPathProxy, fillVisible, runFill, runStroke, strokeVisible } from './utils';
 import { AreaRenderContribution } from './contributions/constants';
-import { BaseRenderContributionTime, Direction } from '../../../common/enums';
+import { Direction } from '../../../common/enums';
 import { drawAreaSegments } from '../../../common/render-area';
 import { AREA_NUMBER_TYPE } from '../../../graphic/constants';
 import { drawSegments } from '../../../common/render-curve';
@@ -43,34 +32,6 @@ import {
   defaultAreaBackgroundRenderContribution,
   defaultAreaTextureRenderContribution
 } from './contributions/area-contribution-render';
-import { segments } from '../../../common/shape/arc';
-
-function calcLineCache(
-  points: IPointLike[],
-  curveType: ICurveType,
-  params?: { direction?: IDirection; startPoint?: IPointLike }
-): ISegPath2D | null {
-  switch (curveType) {
-    case 'linear':
-      return genLinearSegments(points, params);
-    case 'basis':
-      return genBasisSegments(points, params);
-    case 'monotoneX':
-      return genMonotoneXSegments(points, params);
-    case 'monotoneY':
-      return genMonotoneYSegments(points, params);
-    case 'step':
-      return genStepSegments(points, 0.5, params);
-    case 'stepBefore':
-      return genStepSegments(points, 0, params);
-    case 'stepAfter':
-      return genStepSegments(points, 1, params);
-    case 'linearClosed':
-      return genLinearClosedSegments(points, params);
-    default:
-      return genLinearSegments(points, params);
-  }
-}
 
 @injectable()
 export class DefaultCanvasAreaRender extends BaseRender<IArea> implements IGraphicRender {
@@ -150,15 +111,47 @@ export class DefaultCanvasAreaRender extends BaseRender<IArea> implements IGraph
     );
 
     const { x: originX = 0, x: originY = 0 } = area.attribute;
-    if (fill !== false) {
-      if (fillCb) {
-        fillCb(context, area.attribute, areaAttribute);
-      } else if (fillOpacity) {
-        context.setCommonStyle(area, area.attribute, originX - offsetX, originY - offsetY, areaAttribute);
-        context.fill();
+    const _runFill = () => {
+      if (fill !== false) {
+        if (fillCb) {
+          fillCb(context, area.attribute, areaAttribute);
+        } else if (fillOpacity) {
+          context.setCommonStyle(area, area.attribute, originX - offsetX, originY - offsetY, areaAttribute);
+          context.fill();
+        }
       }
-    }
+    };
 
+    const _runStroke = () => {
+      if (stroke) {
+        const { stroke = areaAttribute && areaAttribute.stroke } = area.attribute;
+        if (isArray(stroke) && (stroke[0] || stroke[2]) && stroke[1] === false) {
+          context.beginPath();
+          if (stroke[0]) {
+            context.moveTo(startP.x + offsetX, startP.y + offsetY, z);
+            for (let i = 1; i < points.length; i++) {
+              const p = points[i];
+              context.lineTo(p.x + offsetX, p.y + offsetY, z);
+            }
+          } else if (stroke[2]) {
+            const endP = points[points.length - 1];
+            context.moveTo(endP.x + offsetX, endP.y + offsetY, z);
+            for (let i = points.length - 2; i >= 0; i--) {
+              const p = points[i];
+              context.lineTo((p.x1 ?? p.x) + offsetX, (p.y1 ?? p.y) + offsetY, z);
+            }
+          }
+        }
+        if (strokeCb) {
+          strokeCb(context, area.attribute, areaAttribute);
+        } else {
+          context.setStrokeStyle(area, area.attribute, originX - offsetX, originY - offsetY, areaAttribute);
+          context.stroke();
+        }
+      }
+    };
+
+    _runFill();
     this.afterRenderStep(
       area,
       context,
@@ -174,33 +167,7 @@ export class DefaultCanvasAreaRender extends BaseRender<IArea> implements IGraph
       null,
       { attribute: area.attribute }
     );
-
-    if (stroke) {
-      const { stroke = areaAttribute && areaAttribute.stroke } = area.attribute;
-      if (isArray(stroke) && (stroke[0] || stroke[2]) && stroke[1] === false) {
-        context.beginPath();
-        if (stroke[0]) {
-          context.moveTo(startP.x + offsetX, startP.y + offsetY, z);
-          for (let i = 1; i < points.length; i++) {
-            const p = points[i];
-            context.lineTo(p.x + offsetX, p.y + offsetY, z);
-          }
-        } else if (stroke[2]) {
-          const endP = points[points.length - 1];
-          context.moveTo(endP.x + offsetX, endP.y + offsetY, z);
-          for (let i = points.length - 2; i >= 0; i--) {
-            const p = points[i];
-            context.lineTo((p.x1 ?? p.x) + offsetX, (p.y1 ?? p.y) + offsetY, z);
-          }
-        }
-      }
-      if (strokeCb) {
-        strokeCb(context, area.attribute, areaAttribute);
-      } else {
-        context.setStrokeStyle(area, area.attribute, originX - offsetX, originY - offsetY, areaAttribute);
-        context.stroke();
-      }
-    }
+    _runStroke();
   }
 
   drawShape(
@@ -227,19 +194,29 @@ export class DefaultCanvasAreaRender extends BaseRender<IArea> implements IGraph
       stroke = areaAttribute.stroke,
       fillOpacity = areaAttribute.fillOpacity,
       z = areaAttribute.z,
-      strokeOpacity = areaAttribute.strokeOpacity
+      strokeOpacity = areaAttribute.strokeOpacity,
+      curveTension = areaAttribute.curveTension,
+      connectedType = areaAttribute.connectedType
     } = area.attribute;
 
     const data = this.valid(area, areaAttribute, fillCb, strokeCb);
     if (!data) {
       return;
     }
-    const { doFill, doStroke } = data;
+    const { doFill } = data;
+    const doStroke = data.doStroke && data.sVisible;
 
     const { clipRange = areaAttribute.clipRange, closePath, points, segments } = area.attribute;
     let { curveType = areaAttribute.curveType } = area.attribute;
     if (closePath && curveType === 'linear') {
       curveType = 'linearClosed';
+    }
+
+    function parsePoint(points: IPointLike[], connectedType: 'none' | 'connect') {
+      if (connectedType !== 'connect') {
+        return points;
+      }
+      return points.filter(p => p.defined !== false);
     }
 
     if (clipRange === 1 && !segments && !points.some(p => p.defined === false) && curveType === 'linear') {
@@ -281,8 +258,9 @@ export class DefaultCanvasAreaRender extends BaseRender<IArea> implements IGraph
               startPoint.x = lastTopSeg.endX;
               startPoint.y = lastTopSeg.endY;
             }
-            const data = calcLineCache(seg.points, curveType, {
-              startPoint
+            const data = calcLineCache(parsePoint(seg.points, connectedType), curveType, {
+              startPoint,
+              curveTension
             });
             lastTopSeg = data;
             return data;
@@ -311,8 +289,9 @@ export class DefaultCanvasAreaRender extends BaseRender<IArea> implements IGraph
           }
           if (bottomPoints.length > 1) {
             lastBottomSeg = calcLineCache(
-              bottomPoints,
-              curveType === 'stepBefore' ? 'stepAfter' : curveType === 'stepAfter' ? 'stepBefore' : curveType
+              parsePoint(bottomPoints, connectedType),
+              curveType === 'stepBefore' ? 'stepAfter' : curveType === 'stepAfter' ? 'stepBefore' : curveType,
+              { curveTension }
             );
             bottomCaches.unshift(lastBottomSeg);
           }
@@ -323,18 +302,19 @@ export class DefaultCanvasAreaRender extends BaseRender<IArea> implements IGraph
         }));
       } else if (points && points.length) {
         // 转换points
-        const topPoints = points;
+        const topPoints = parsePoint(points, connectedType);
         const bottomPoints: IPointLike[] = [];
-        for (let i = points.length - 1; i >= 0; i--) {
+        for (let i = topPoints.length - 1; i >= 0; i--) {
           bottomPoints.push({
-            x: points[i].x1 ?? points[i].x,
-            y: points[i].y1 ?? points[i].y
+            x: topPoints[i].x1 ?? topPoints[i].x,
+            y: topPoints[i].y1 ?? topPoints[i].y
           });
         }
-        const topCache = calcLineCache(topPoints, curveType);
+        const topCache = calcLineCache(topPoints, curveType, { curveTension });
         const bottomCache = calcLineCache(
           bottomPoints,
-          curveType === 'stepBefore' ? 'stepAfter' : curveType === 'stepAfter' ? 'stepBefore' : curveType
+          curveType === 'stepBefore' ? 'stepAfter' : curveType === 'stepAfter' ? 'stepBefore' : curveType,
+          { curveTension }
         );
 
         area.cacheArea = { top: topCache, bottom: bottomCache };
@@ -484,50 +464,24 @@ export class DefaultCanvasAreaRender extends BaseRender<IArea> implements IGraph
       themeAttribute: IThemeAttribute | IThemeAttribute[]
     ) => boolean
   ): boolean {
-    let ret = false;
-    ret =
-      ret ||
-      this._drawSegmentItem(
-        context,
-        cache,
-        fill,
-        fillOpacity,
-        stroke,
-        strokeOpacity,
-        attribute,
-        defaultAttribute,
-        clipRange,
-        offsetX,
-        offsetY,
-        offsetZ,
-        area,
-        drawContext,
-        false,
-        fillCb,
-        strokeCb
-      );
-    ret =
-      ret ||
-      this._drawSegmentItem(
-        context,
-        cache,
-        fill,
-        fillOpacity,
-        stroke,
-        strokeOpacity,
-        attribute,
-        defaultAttribute,
-        clipRange,
-        offsetX,
-        offsetY,
-        offsetZ,
-        area,
-        drawContext,
-        true,
-        fillCb,
-        strokeCb
-      );
-    return ret;
+    return this._drawSegmentItem(
+      context,
+      cache,
+      fill,
+      fillOpacity,
+      stroke,
+      strokeOpacity,
+      attribute,
+      defaultAttribute,
+      clipRange,
+      offsetX,
+      offsetY,
+      offsetZ,
+      area,
+      drawContext,
+      fillCb,
+      strokeCb
+    );
   }
 
   protected _drawSegmentItem(
@@ -545,7 +499,6 @@ export class DefaultCanvasAreaRender extends BaseRender<IArea> implements IGraph
     offsetZ: number,
     area: IArea,
     drawContext: IDrawContext,
-    connect: boolean,
     fillCb?: (
       ctx: IContext2d,
       lineAttribute: Partial<IMarkAttribute & IGraphicAttribute>,
@@ -570,38 +523,6 @@ export class DefaultCanvasAreaRender extends BaseRender<IArea> implements IGraph
     ) {
       return;
     }
-    // 绘制connect区域
-    let { connectedType, connectedX, connectedY, connectedStyle } = attribute;
-    const da = [];
-    if (connect) {
-      if (isArray(defaultAttribute)) {
-        connectedType = connectedType ?? defaultAttribute[0].connectedType ?? defaultAttribute[1].connectedType;
-        connectedX = connectedX ?? defaultAttribute[0].connectedX ?? defaultAttribute[1].connectedX;
-        connectedY = connectedY ?? defaultAttribute[0].connectedY ?? defaultAttribute[1].connectedY;
-        connectedStyle = connectedStyle ?? defaultAttribute[0].connectedStyle ?? defaultAttribute[1].connectedStyle;
-      } else {
-        connectedType = connectedType ?? defaultAttribute.connectedType;
-        connectedX = connectedX ?? defaultAttribute.connectedX;
-        connectedY = connectedY ?? defaultAttribute.connectedY;
-        connectedStyle = connectedStyle ?? defaultAttribute.connectedStyle;
-      }
-
-      // 如果有非法值就是none
-      if (connectedType !== 'connect' && connectedType !== 'zero') {
-        connectedType = 'none';
-      }
-
-      if (isArray(defaultAttribute)) {
-        defaultAttribute.forEach(i => da.push(i));
-      } else {
-        da.push(defaultAttribute);
-      }
-      da.push(attribute);
-    }
-
-    if (connect && connectedType === 'none') {
-      return false;
-    }
 
     context.beginPath();
 
@@ -621,7 +542,11 @@ export class DefaultCanvasAreaRender extends BaseRender<IArea> implements IGraph
     }
     const xTotalLength = abs(endP.x - startP.x);
     const yTotalLength = abs(endP.y - startP.y);
-    if (!Number.isFinite(xTotalLength + yTotalLength)) {
+    if (endP.x1 == null) {
+      direction = Direction.ROW;
+    } else if (endP.y1 == null) {
+      direction = Direction.COLUMN;
+    } else if (!Number.isFinite(xTotalLength + yTotalLength)) {
       direction = Direction.ROW;
     } else {
       direction = xTotalLength > yTotalLength ? Direction.ROW : Direction.COLUMN;
@@ -630,11 +555,7 @@ export class DefaultCanvasAreaRender extends BaseRender<IArea> implements IGraph
       offsetX,
       offsetY,
       offsetZ,
-      direction,
-      drawConnect: connect,
-      mode: connectedType,
-      zeroX: connectedX,
-      zeroY: connectedY
+      direction
     });
 
     this.beforeRenderStep(
@@ -657,21 +578,45 @@ export class DefaultCanvasAreaRender extends BaseRender<IArea> implements IGraph
     context.setShadowBlendStyle && context.setShadowBlendStyle(area, attribute, defaultAttribute);
 
     const { x: originX = 0, x: originY = 0 } = attribute;
-    if (fill !== false) {
-      if (fillCb) {
-        fillCb(context, attribute, defaultAttribute);
-      } else if (fillOpacity) {
-        context.setCommonStyle(
-          area,
-          connect ? connectedStyle : attribute,
-          originX - offsetX,
-          originY - offsetY,
-          connect ? da : defaultAttribute
-        );
-        context.fill();
+    const _runFill = () => {
+      if (fill !== false) {
+        if (fillCb) {
+          fillCb(context, attribute, defaultAttribute);
+        } else if (fillOpacity) {
+          context.setCommonStyle(area, attribute, originX - offsetX, originY - offsetY, defaultAttribute);
+          context.fill();
+        }
       }
-    }
+    };
 
+    const _runStroke = () => {
+      if (stroke !== false) {
+        if (strokeCb) {
+          strokeCb(context, attribute, defaultAttribute);
+        } else {
+          const { stroke = defaultAttribute && (defaultAttribute as any)[1] && (defaultAttribute as any)[1].stroke } =
+            attribute;
+          if (isArray(stroke) && (stroke[0] || stroke[2]) && stroke[1] === false) {
+            context.beginPath();
+            drawSegments(
+              context.camera ? context : context.nativeContext,
+              stroke[0] ? cache.top : cache.bottom,
+              clipRange,
+              direction === Direction.ROW ? 'x' : 'y',
+              {
+                offsetX,
+                offsetY,
+                offsetZ
+              }
+            );
+          }
+          context.setStrokeStyle(area, attribute, originX - offsetX, originY - offsetY, defaultAttribute);
+          context.stroke();
+        }
+      }
+    };
+
+    _runFill();
     this.afterRenderStep(
       area,
       context,
@@ -687,40 +632,7 @@ export class DefaultCanvasAreaRender extends BaseRender<IArea> implements IGraph
       null,
       { attribute }
     );
-
-    if (stroke !== false) {
-      if (strokeCb) {
-        strokeCb(context, attribute, defaultAttribute);
-      } else {
-        const { stroke = defaultAttribute && defaultAttribute[1] && defaultAttribute[1].stroke } = attribute;
-        if (isArray(stroke) && (stroke[0] || stroke[2]) && stroke[1] === false) {
-          context.beginPath();
-          drawSegments(
-            context.camera ? context : context.nativeContext,
-            stroke[0] ? cache.top : cache.bottom,
-            clipRange,
-            direction === Direction.ROW ? 'x' : 'y',
-            {
-              offsetX,
-              offsetY,
-              offsetZ,
-              drawConnect: connect,
-              mode: connectedType,
-              zeroX: connectedX,
-              zeroY: connectedY
-            }
-          );
-        }
-        context.setStrokeStyle(
-          area,
-          connect ? connectedStyle : attribute,
-          originX - offsetX,
-          originY - offsetY,
-          connect ? da : defaultAttribute
-        );
-        context.stroke();
-      }
-    }
+    _runStroke();
 
     return ret;
   }

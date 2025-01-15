@@ -2,6 +2,7 @@ import _roughModule from './render/contributions/rough/module';
 // import _canvasModuleLoader from './canvas/contributions/canvas-module';
 
 export const roughModule = _roughModule;
+export * from './picker/contributions/constants';
 
 export * from './jsx';
 export * from './react-tree';
@@ -49,6 +50,10 @@ export * from './picker/contributions/canvas-picker/rect3d-module';
 export * from './picker/contributions/canvas-picker/arc3d-module';
 
 export * from './picker/contributions/canvas-picker/pyramid3d-module';
+
+export * from './graphic/gif-image';
+export * from './picker/contributions/canvas-picker/gif-image-module';
+export * from './render/contributions/canvas/gif-image-module';
 
 export * from './register/register-arc';
 export * from './register/register-arc3d';

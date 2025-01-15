@@ -1,13 +1,15 @@
 import type {
   EasingType,
   IGroupGraphicAttribute,
+  ILinearGradient,
   ISymbolGraphicAttribute,
   ITextGraphicAttribute
 } from '@visactor/vrender-core';
 import type { BaseGraphicAttributes, Padding } from '../../core/type';
-import type { PagerAttributes } from '../../pager';
+import type { PagerAttributes } from '../../pager/type';
 import type { LegendBaseAttributes } from '../type';
 import type { ScrollBarAttributes } from '../../scrollbar/type';
+import type { GraphicEventType } from '@visactor/vrender-core';
 
 export interface LegendSwitchComponentAttributes {
   /**
@@ -32,6 +34,9 @@ export interface LegendSwitchComponentAttributes {
   animationEasing?: EasingType;
 }
 
+/**
+ * 离散类型的图例组件，当图例项较多的时候，默认使用分页器组件
+ */
 export type LegendPagerAttributes = Omit<PagerAttributes, 'total'> &
   LegendSwitchComponentAttributes & {
     /**
@@ -41,10 +46,45 @@ export type LegendPagerAttributes = Omit<PagerAttributes, 'total'> &
     position?: 'start' | 'middle' | 'end';
   };
 
+/**
+ * 离散类型的图例组件使用滚动条组件的时候对应的配置
+ */
 export type LegendScrollbarAttributes = Omit<ScrollBarAttributes, 'range' | 'limitRange'> &
   LegendSwitchComponentAttributes & {
+    /**
+     * 将翻页器的类型设置为 'scrollbar'
+     * 申明图例组件使用滚动条进行翻页展示更多的图例项
+     */
     type: 'scrollbar';
+    /**
+     * @deprecated since 0.20.13
+     * 滚动条的位置是否支持展示在分页的中间。
+     * 0.20.13 版本改造了滚动条逻辑后，此配置废弃。改造内容：
+     *   由分页拟合的滚动调整为滚动窗口的逻辑，不再与分页绑定
+     */
     scrollByPosition?: boolean;
+    /**
+     * 是否支持鼠标/触控板滚动
+     * @default false
+     */
+    roamScroll?: boolean;
+    /**
+     * @since 0.20.13
+     * 是否隐藏滚动条
+     */
+    visible?: boolean;
+    /**
+     * @since 0.20.13
+     * 滚动时，图例区域未到尽头时的前后遮罩
+     */
+    scrollMask?: {
+      /** 是否显示 @default false */
+      visible?: boolean;
+      /** 渐变区域长度 @default 16 */
+      gradientLength?: number;
+      /** 渐变配置 */
+      gradientStops: ILinearGradient['stops'];
+    };
   };
 
 export type LegendItemDatum = {
@@ -178,17 +218,44 @@ export type LegendItem = {
    * 'right' 图标在右侧
    */
   align?: 'left' | 'right';
+  /**
+   * 水平方向时，一行中多个图例的垂直对齐方式
+   * @since 0.21.3
+   */
+  verticalAlign?: 'top' | 'middle' | 'bottom';
 };
 
 export type DiscreteLegendAttrs = {
   /**
    * 是否开启选中交互
    */
-  select?: boolean;
+  select?:
+    | boolean
+    | {
+        /**
+         * 触发选中交互的事件类型
+         * @since 0.20.13
+         **/
+        trigger?: GraphicEventType;
+      };
+
   /**
    * 是否开启 hover 交互
    */
-  hover?: boolean;
+  hover?:
+    | boolean
+    | {
+        /**
+         * 触发hover交互的事件类型
+         * @since 0.20.13
+         **/
+        trigger?: GraphicEventType;
+        /**
+         * 触发取消hover交互的事件类型
+         * @since 0.20.13
+         **/
+        triggerOff?: GraphicEventType;
+      };
   /**
    * 图例数据
    */
@@ -201,8 +268,9 @@ export type DiscreteLegendAttrs = {
    * 单选/多选模式配置，默认 'multiple'。
    * - `single` 表示单选
    * - `multiple` 表示多选
+   * - `focus` 表示聚焦模式 （自 0.19.2版本开始支持）
    */
-  selectMode?: 'single' | 'multiple';
+  selectMode?: 'single' | 'multiple' | 'focus';
   /**
    * 是否允许图例全部取消，多选模式下生效
    */

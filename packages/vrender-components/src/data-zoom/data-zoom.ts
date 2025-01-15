@@ -309,14 +309,14 @@ export class DataZoom extends AbstractComponent<Required<DataZoomAttributes>> {
     // 避免attributes相同时, 重复渲染
     if (startAttr !== start || endAttr !== end) {
       this.setStateAttr(start, end, true);
-    }
 
-    if (realTime) {
-      this._dispatchEvent('change', {
-        start,
-        end,
-        tag: this._activeTag
-      });
+      if (realTime) {
+        this._dispatchEvent('change', {
+          start,
+          end,
+          tag: this._activeTag
+        });
+      }
     }
   };
   private _onHandlerPointerMove =
@@ -345,12 +345,13 @@ export class DataZoom extends AbstractComponent<Required<DataZoomAttributes>> {
     // 避免attributes相同时, 重复渲染
     if (start !== this.state.start || end !== this.state.end) {
       this.setStateAttr(this.state.start, this.state.end, true);
+
+      this._dispatchEvent('change', {
+        start: this.state.start,
+        end: this.state.end,
+        tag: this._activeTag
+      });
     }
-    this._dispatchEvent('change', {
-      start: this.state.start,
-      end: this.state.end,
-      tag: this._activeTag
-    });
 
     // 拖拽结束后卸载事件
     if (vglobal.env === 'browser') {
@@ -522,11 +523,11 @@ export class DataZoom extends AbstractComponent<Required<DataZoomAttributes>> {
       };
       startTextAlignStyle = {
         textAlign: this.isTextOverflow(componentBoundsLike, startTextBounds, 'start') ? 'left' : 'right',
-        textBaseline: 'middle'
+        textBaseline: restStartTextStyle?.textStyle?.textBaseline ?? 'middle'
       };
       endTextAlignStyle = {
         textAlign: this.isTextOverflow(componentBoundsLike, endTextBounds, 'end') ? 'right' : 'left',
-        textBaseline: 'middle'
+        textBaseline: restEndTextStyle?.textStyle?.textBaseline ?? 'middle'
       };
     } else {
       startTextPosition = {
@@ -538,11 +539,11 @@ export class DataZoom extends AbstractComponent<Required<DataZoomAttributes>> {
         y: position.y + end * height
       };
       startTextAlignStyle = {
-        textAlign: 'center',
+        textAlign: restStartTextStyle?.textStyle?.textAlign ?? 'center',
         textBaseline: this.isTextOverflow(componentBoundsLike, startTextBounds, 'start') ? 'top' : 'bottom'
       };
       endTextAlignStyle = {
-        textAlign: 'center',
+        textAlign: restEndTextStyle?.textStyle?.textAlign ?? 'center',
         textBaseline: this.isTextOverflow(componentBoundsLike, endTextBounds, 'end') ? 'bottom' : 'top'
       };
     }

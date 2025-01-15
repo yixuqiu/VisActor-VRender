@@ -1,22 +1,30 @@
-import type { IRichTextAttribute, ITextGraphicAttribute } from '@visactor/vrender-core';
+import type {
+  IRichText,
+  IRichTextAttribute,
+  IText,
+  ITextGraphicAttribute,
+  TextAlignType
+} from '@visactor/vrender-core';
 // eslint-disable-next-line no-duplicate-imports
 import { getTextBounds, graphicCreator } from '@visactor/vrender-core';
 import type { ITextMeasureOption } from '@visactor/vutils';
 // eslint-disable-next-line no-duplicate-imports
-import { TextMeasure, isObject } from '@visactor/vutils';
+import { TextMeasure, isObject, isValid } from '@visactor/vutils';
 import { DEFAULT_TEXT_FONT_FAMILY, DEFAULT_TEXT_FONT_SIZE } from '../constant';
 import type { HTMLTextContent, ReactTextContent, TextContent } from '../core/type';
 
 export const initTextMeasure = (
   textSpec?: Partial<ITextGraphicAttribute>,
   option?: Partial<ITextMeasureOption>,
-  useNaiveCanvas?: boolean
+  useNaiveCanvas?: boolean,
+  defaultFontParams?: Partial<ITextGraphicAttribute>
 ): TextMeasure<ITextGraphicAttribute> => {
   return new TextMeasure<ITextGraphicAttribute>(
     {
       defaultFontParams: {
         fontFamily: DEFAULT_TEXT_FONT_FAMILY,
-        fontSize: DEFAULT_TEXT_FONT_SIZE
+        fontSize: DEFAULT_TEXT_FONT_SIZE,
+        ...defaultFontParams
       },
       getTextBounds: useNaiveCanvas ? undefined : getTextBounds,
       specialCharSet: '-/: .,@%\'"~' + TextMeasure.ALPHABET_CHAR_SET + TextMeasure.ALPHABET_CHAR_SET.toUpperCase(),
@@ -67,9 +75,13 @@ export function getTextType(attributes: TextContent, typeKey = 'type') {
 }
 
 export function richTextAttributeTransform(attributes: ITextGraphicAttribute & IRichTextAttribute & TextContent) {
+  if (isValid(attributes.maxLineWidth)) {
+    attributes.maxWidth = attributes.maxLineWidth;
+    delete attributes.maxLineWidth;
+  }
+
   attributes.width = attributes.width ?? 0;
   attributes.height = attributes.height ?? 0;
-  attributes.maxWidth = attributes.maxLineWidth;
   attributes.textConfig = (attributes.text as unknown as any).text || attributes.text;
   return attributes;
 }
@@ -108,4 +120,34 @@ export function createTextGraphicByType(textAttributes: ITextGraphicAttribute, t
   }
 
   return graphicCreator.text(textAttributes as ITextGraphicAttribute);
+}
+
+export function alignTextInLine(
+  layoutAlign: 'left' | 'right',
+  graphic: IText | IRichText,
+  textAlign: TextAlignType,
+  pos: number,
+  textWidth: number
+) {
+  if (layoutAlign === 'right') {
+    if (textAlign === 'center') {
+      graphic.setAttribute('x', pos - textWidth / 2);
+    } else if (textAlign === 'right' || textAlign === 'end') {
+      // 右对齐
+      graphic.setAttribute('x', pos);
+    } else {
+      // 默认左对齐
+      graphic.setAttribute('x', pos - textWidth);
+    }
+  } else {
+    if (textAlign === 'center') {
+      graphic.setAttribute('x', pos + textWidth / 2);
+    } else if (textAlign === 'right' || textAlign === 'end') {
+      // 右对齐
+      graphic.setAttribute('x', pos + textWidth);
+    } else {
+      // 默认左对齐
+      graphic.setAttribute('x', pos);
+    }
+  }
 }

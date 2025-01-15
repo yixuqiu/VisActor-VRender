@@ -4,10 +4,10 @@ group: graphic-rect
 title: morphing-animate
 keywords: morphing-rect
 order: 1-0
-cover: http://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/morphing.gif
+cover: https://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/morphing.gif
 ---
 
-# rect 图元
+# morphing-animate
 
 ## 代码演示
 

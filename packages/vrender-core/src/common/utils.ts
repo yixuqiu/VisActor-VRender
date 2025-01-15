@@ -214,6 +214,7 @@ export function pointEqual(pointA: IPointLike, pointB: IPointLike): boolean {
 export function pointInterpolation(pointA: IPointLike, pointB: IPointLike, ratio: number): IPointLike {
   const { x, y } = pointAt(pointA.x, pointA.y, pointB.x, pointB.y, ratio);
   const { x: x1, y: y1 } = pointAt(pointA.x1, pointA.y1, pointB.x1, pointB.y1, ratio);
+
   const point = new Point(x as number, y as number, x1, y1);
   point.defined = pointB.defined;
   return point;
@@ -323,9 +324,9 @@ export class RafBasedSTO {
   lastDate: number;
   durationsListThreshold: number;
 
-  constructor() {
+  constructor(timeout: number = RafBasedSTO.TimeOut) {
     this.durations = [];
-    this.timeout = RafBasedSTO.TimeOut;
+    this.timeout = timeout;
     this.lastDate = 0;
     this.durationsListThreshold = 30;
   }
@@ -361,10 +362,15 @@ export class RafBasedSTO {
 
 export const rafBasedSto = new RafBasedSTO();
 
-export const calculateLineHeight = (lineHeight: string | number, fontSize: number): number => {
+export const _calculateLineHeight = (lineHeight: string | number, fontSize: number): number => {
   if (isString(lineHeight) && lineHeight[lineHeight.length - 1] === '%') {
     const scale = Number.parseFloat(lineHeight.substring(0, lineHeight.length - 1)) / 100;
     return fontSize * scale;
   }
   return lineHeight as number;
+};
+
+export const calculateLineHeight = (lineHeight: string | number, fontSize: number): number => {
+  const _lh = _calculateLineHeight(lineHeight, fontSize);
+  return isNaN(_lh) ? _lh : Math.max(fontSize, _lh);
 };

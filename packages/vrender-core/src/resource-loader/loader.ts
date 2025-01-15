@@ -98,6 +98,7 @@ export class ResourceLoader {
               mark.imageLoadFail(svgStr);
             }
           });
+          data.waitingMark && (data.waitingMark = []);
         });
       }
     }
@@ -107,9 +108,9 @@ export class ResourceLoader {
     let data = ResourceLoader.cache.get(url);
     if (data) {
       // 存在缓存
-      if (data.loadState === 'init' || data.loadState === 'fail') {
+      if (data.loadState === 'fail') {
         return Promise.reject();
-      } else if (data.loadState === 'loading') {
+      } else if (data.loadState === 'init' || data.loadState === 'loading') {
         return data.dataPromise.then(data => data.data);
       }
       return Promise.resolve(data.data);
@@ -165,6 +166,8 @@ export class ResourceLoader {
                   mark.imageLoadFail(url);
                 }
               });
+
+              data.waitingMark && (data.waitingMark = []);
             });
 
             promises.push(end);

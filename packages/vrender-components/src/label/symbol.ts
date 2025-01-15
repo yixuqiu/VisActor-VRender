@@ -4,6 +4,7 @@ import type { SymbolLabelAttrs } from './type';
 import { LabelBase } from './base';
 import { labelingPoint } from './util';
 import type { ComponentOptions } from '../interface';
+import { registerLabelComponent } from './data-label-register';
 
 export class SymbolLabel extends LabelBase<SymbolLabelAttrs> {
   name = 'symbol-label';
@@ -17,10 +18,16 @@ export class SymbolLabel extends LabelBase<SymbolLabelAttrs> {
   };
 
   constructor(attributes: SymbolLabelAttrs, options?: ComponentOptions) {
-    super(options?.skipDefault ? attributes : merge({}, SymbolLabel.defaultAttributes, attributes));
+    const { data, ...restAttributes } = attributes;
+    super(options?.skipDefault ? attributes : { data, ...merge({}, SymbolLabel.defaultAttributes, restAttributes) });
   }
 
   protected labeling(textBounds: IBoundsLike, graphicBounds: IBoundsLike, position = 'top', offset = 0) {
     return labelingPoint(textBounds, graphicBounds, position, offset);
   }
 }
+
+export const registerSymbolDataLabel = () => {
+  registerLabelComponent('symbol', SymbolLabel);
+  registerLabelComponent('line-data', SymbolLabel);
+};

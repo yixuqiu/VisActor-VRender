@@ -190,6 +190,10 @@ export const pages = [
       {
         name: 'react',
         path: 'react'
+      },
+      {
+        name: 'gif-image',
+        path: 'gif-image'
       }
     ]
   },
@@ -207,6 +211,10 @@ export const pages = [
       {
         name: '3d点图',
         path: 'points3d'
+      },
+      {
+        name: 'richtext-editor',
+        path: 'richtext-editor'
       }
     ]
   },
@@ -220,6 +228,10 @@ export const pages = [
       {
         name: 'vtable',
         path: 'vtable'
+      },
+      {
+        name: 'harmony',
+        path: 'harmony'
       }
     ]
   }
