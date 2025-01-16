@@ -3,7 +3,7 @@ import type { IContext2d, SymbolType, ISymbolClass } from '../../interface';
 import { BaseSymbol } from './base';
 
 /**
- * 
+ *
  *Copyright 2010-2021 Mike Bostock
 
   Permission to use, copy, modify, and/or distribute this software for any purpose
@@ -21,14 +21,6 @@ import { BaseSymbol } from './base';
 // 借鉴自d3
 // https://github.com/d3/d3-shape/blob/main/src/symbol/triangle.js
 
-export function trianglLeft(ctx: IContext2d, r: number, x: number, y: number) {
-  ctx.moveTo(-r + x, y);
-  ctx.lineTo(r + x, r + y);
-  ctx.lineTo(r + x, y - r);
-  ctx.closePath();
-  return true;
-}
-
 export function trianglLeftOffset(ctx: IContext2d, r: number, x: number, y: number, offset: number) {
   ctx.moveTo(-r + x - 2 * offset, y);
   ctx.lineTo(r + x + offset, r + y + 2 * offset);
@@ -43,12 +35,12 @@ export class TriangleLeftSymbol extends BaseSymbol implements ISymbolClass {
   pathStr: string = 'M-0.5,0 L0.5,0.5 L0.5,-0.5 Z';
 
   draw(ctx: IContext2d, size: number, x: number, y: number) {
-    const r = size / 2;
-    return trianglLeft(ctx, r, x, y);
+    const r = this.parseSize(size) / 2;
+    return trianglLeftOffset(ctx, r, x, y, 0);
   }
 
   drawOffset(ctx: IContext2d, size: number, x: number, y: number, offset: number) {
-    const r = size / 2;
+    const r = this.parseSize(size) / 2;
     return trianglLeftOffset(ctx, r, x, y, offset);
   }
 }

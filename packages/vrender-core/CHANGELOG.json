@@ -2,6 +2,780 @@
   "name": "@visactor/vrender-core",
   "entries": [
     {
+      "version": "0.21.11",
+      "tag": "@visactor/vrender-core_v0.21.11",
+      "date": "Wed, 15 Jan 2025 12:13:28 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix issue with area connect type"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.10",
+      "tag": "@visactor/vrender-core_v0.21.10",
+      "date": "Wed, 15 Jan 2025 03:14:32 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.21.9",
+      "tag": "@visactor/vrender-core_v0.21.9",
+      "date": "Mon, 13 Jan 2025 03:23:50 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: change effect for connectedType, closed #1660 "
+          },
+          {
+            "comment": "fix: fix issue with animate error when graphic.stage is null"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.8",
+      "tag": "@visactor/vrender-core_v0.21.8",
+      "date": "Mon, 06 Jan 2025 11:07:36 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: add isImageAnonymous in global"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.7",
+      "tag": "@visactor/vrender-core_v0.21.7",
+      "date": "Wed, 25 Dec 2024 07:53:11 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: upgrade vutils to 0.19.3\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.6",
+      "tag": "@visactor/vrender-core_v0.21.6",
+      "date": "Tue, 24 Dec 2024 12:46:37 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix issue with stroke clip"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.5",
+      "tag": "@visactor/vrender-core_v0.21.5",
+      "date": "Tue, 24 Dec 2024 07:53:11 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix issue with image background stroke, closed #1640"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.4",
+      "tag": "@visactor/vrender-core_v0.21.4",
+      "date": "Mon, 23 Dec 2024 10:16:00 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.21.3",
+      "tag": "@visactor/vrender-core_v0.21.3",
+      "date": "Mon, 23 Dec 2024 08:28:14 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support loadFont"
+          },
+          {
+            "comment": "feat: support penetrateEventList"
+          },
+          {
+            "comment": "fix: fix issue with image stroke and background"
+          },
+          {
+            "comment": "fix: fix issue with html when include interactive layer"
+          },
+          {
+            "comment": "fix: fix issue with richtext not support setShadowBlendStyle"
+          },
+          {
+            "comment": "fix: optimize the performance of ticks in time-scale\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.2",
+      "tag": "@visactor/vrender-core_v0.21.2",
+      "date": "Thu, 12 Dec 2024 10:23:51 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix issue with shadow-root transform"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.1",
+      "tag": "@visactor/vrender-core_v0.21.1",
+      "date": "Thu, 05 Dec 2024 07:50:47 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix issue with insertAfter and insertBefore"
+          },
+          {
+            "comment": "fix: fix the issue when line is configured to connect, closed #3238"
+          },
+          {
+            "comment": "fix: fix issue with richtext setAttribute, closed #1578"
+          },
+          {
+            "comment": "fix: fix issue with richtext default font"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.0",
+      "tag": "@visactor/vrender-core_v0.21.0",
+      "date": "Thu, 28 Nov 2024 03:30:36 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: use ascend and decent to make measure more accurate"
+          },
+          {
+            "comment": "feat: sync animated attribute while call render func, closed #1416"
+          },
+          {
+            "comment": "fix: smooth out stuttering effects when multiple TagPointsUpdate instances execute concurrently"
+          },
+          {
+            "comment": "fix: fix issue with dirtyBounds incorrectly while set visible"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.16",
+      "tag": "@visactor/vrender-core_v0.20.16",
+      "date": "Thu, 21 Nov 2024 06:58:23 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix issue with _debug_bounds"
+          },
+          {
+            "comment": "fix: fix issue with string linear-gradient"
+          },
+          {
+            "comment": "fix: fix issue where not work when lineWidth is set to 0"
+          },
+          {
+            "comment": "fix: fix drawing issue when size is array"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.15",
+      "tag": "@visactor/vrender-core_v0.20.15",
+      "date": "Fri, 15 Nov 2024 08:34:34 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support keepStrokeScale"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.14",
+      "tag": "@visactor/vrender-core_v0.20.14",
+      "date": "Wed, 13 Nov 2024 07:47:16 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.20.13",
+      "tag": "@visactor/vrender-core_v0.20.13",
+      "date": "Wed, 13 Nov 2024 06:35:02 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support auto refresh plugin"
+          },
+          {
+            "comment": "fix: fix smartInvert of gradient bar\n\n"
+          },
+          {
+            "comment": "fix: fix issue with text clip"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.12",
+      "tag": "@visactor/vrender-core_v0.20.12",
+      "date": "Thu, 31 Oct 2024 02:49:49 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.20.11",
+      "tag": "@visactor/vrender-core_v0.20.11",
+      "date": "Wed, 30 Oct 2024 13:10:03 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix group fill gradient #1518"
+          },
+          {
+            "comment": "fix: annotate the Ramer Douglas Peucker algorithm in point optimization"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.10",
+      "tag": "@visactor/vrender-core_v0.20.10",
+      "date": "Wed, 23 Oct 2024 08:37:33 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support fillStrokeOrder, closed #1505"
+          },
+          {
+            "comment": "fix: fix issue with parse m where multi pos follow, closed #1490"
+          },
+          {
+            "comment": "fix: fix the accuracy issue of number matching, closed #1488"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.9",
+      "tag": "@visactor/vrender-core_v0.20.9",
+      "date": "Tue, 15 Oct 2024 03:50:15 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: text support keep-all, closed #1466"
+          },
+          {
+            "comment": "fix: fix max width of arc label in left\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.8",
+      "tag": "@visactor/vrender-core_v0.20.8",
+      "date": "Sun, 29 Sep 2024 09:44:02 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix line bounds with defined false, closed #1463"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.7",
+      "tag": "@visactor/vrender-core_v0.20.7",
+      "date": "Fri, 27 Sep 2024 03:22:31 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.20.6",
+      "tag": "@visactor/vrender-core_v0.20.6",
+      "date": "Thu, 26 Sep 2024 09:28:36 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix customPath of arc\n\n"
+          },
+          {
+            "comment": "feat: support obb bounds in text graphic"
+          },
+          {
+            "comment": "fix: fix limit width of arc label when has customized align offset\n\n"
+          },
+          {
+            "comment": "fix: fix error of `alternateColor`\n\n"
+          },
+          {
+            "comment": "fix: fix issue with interactive graphic while parent was removed"
+          },
+          {
+            "comment": "fix: outside label should not apply `smartInvert`\n\n"
+          },
+          {
+            "comment": "fix: fix `boundsPadding` of legend focus icon\n\n"
+          },
+          {
+            "comment": "fix: line segment update animation result error"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.5",
+      "tag": "@visactor/vrender-core_v0.20.5",
+      "date": "Fri, 20 Sep 2024 06:37:57 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: poptip suppport multiline text, closed #1444"
+          },
+          {
+            "comment": "feat: fix issue with richtext width on disableAutoWrapLine mode, support clip attr"
+          },
+          {
+            "comment": "fix: fix error of `bounds-contex` when use `arcTo` in customShape"
+          },
+          {
+            "comment": "fix: fix maxLineWidth of arc label\n\n"
+          },
+          {
+            "comment": "fix: fix path string of arc, fix #1434\n\n"
+          },
+          {
+            "comment": "fix: fix error of morphing animation in `multiToOneMorph`, fix #1439\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.4",
+      "tag": "@visactor/vrender-core_v0.20.4",
+      "date": "Thu, 12 Sep 2024 07:33:20 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: pauseRender support pass count"
+          },
+          {
+            "comment": "fix: add updateHoverIconState in richtext"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.3",
+      "tag": "@visactor/vrender-core_v0.20.3",
+      "date": "Sat, 07 Sep 2024 09:16:33 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix error of updateAABBbounds when morphing\n\n"
+          },
+          {
+            "comment": "fix: tag padding not work when label is rich text. fix@VisActor/VChart#3151"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.2",
+      "tag": "@visactor/vrender-core_v0.20.2",
+      "date": "Wed, 04 Sep 2024 12:52:31 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix error of interpolate when use rgba color\n\n"
+          },
+          {
+            "comment": "fix: fix bug of label in radarchart triggered by aniamtion\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.1",
+      "tag": "@visactor/vrender-core_v0.20.1",
+      "date": "Fri, 30 Aug 2024 09:55:08 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix issue with poptip release"
+          },
+          {
+            "comment": "fix: fix issue with animate zero duration"
+          },
+          {
+            "comment": "fix: fix textAlign of label when set different angle\n\n"
+          },
+          {
+            "comment": "fix: fix memory leak problem in ResourceLoader"
+          },
+          {
+            "comment": "fix: fix issue with richtext edit plugin while defucus out of text"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.0",
+      "tag": "@visactor/vrender-core_v0.20.0",
+      "date": "Thu, 15 Aug 2024 07:26:54 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix bug of auto-render when remove some graphics\n\n"
+          },
+          {
+            "comment": "fix: optimize triangle symbols\n\n"
+          },
+          {
+            "comment": "refactor: optimize cornerRadius parse of arc\n\n"
+          },
+          {
+            "comment": "refactor: remove polyfill from reflect-metadata"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.24",
+      "tag": "@visactor/vrender-core_v0.19.24",
+      "date": "Tue, 13 Aug 2024 07:47:29 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support polygon of circle-axis\n\n"
+          },
+          {
+            "comment": "feat: support rect corner array with array stroke"
+          },
+          {
+            "comment": "fix: fix wrong stroke style is applied to area\n\n"
+          },
+          {
+            "comment": "fix: fix issue with baseOpacity equal to 0"
+          },
+          {
+            "comment": "fix: fix edge and corner stroke in createRectPath()"
+          },
+          {
+            "comment": "fix: fix issue with shadow group matrix"
+          },
+          {
+            "comment": "fix: fix issue with disableAutoWrapLine"
+          },
+          {
+            "comment": "fix: fix richtext icon pick range #1362"
+          },
+          {
+            "comment": "fix: fix issue with richtext attribute update"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.23",
+      "tag": "@visactor/vrender-core_v0.19.23",
+      "date": "Tue, 06 Aug 2024 05:17:39 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix picker of shadow root group\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.22",
+      "tag": "@visactor/vrender-core_v0.19.22",
+      "date": "Mon, 05 Aug 2024 09:08:30 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: shadow graphic support pick group"
+          },
+          {
+            "comment": "fix: fix issue with Event class in harmony event"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.21",
+      "tag": "@visactor/vrender-core_v0.19.21",
+      "date": "Mon, 05 Aug 2024 01:39:45 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.20",
+      "tag": "@visactor/vrender-core_v0.19.20",
+      "date": "Wed, 31 Jul 2024 09:48:37 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support array cornerRadius, closed #1322"
+          },
+          {
+            "comment": "feat: support catmull-rom and catmull-rom-closed curve, closed #1320"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.19",
+      "tag": "@visactor/vrender-core_v0.19.19",
+      "date": "Tue, 23 Jul 2024 11:56:39 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: marker label support custom shape. close @Visactor/VChart#2959"
+          },
+          {
+            "comment": "fix: fixed the problem that the bounds calculation of line mark is wrong when the defiend of some points is false\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.18",
+      "tag": "@visactor/vrender-core_v0.19.18",
+      "date": "Fri, 12 Jul 2024 07:18:10 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: support react 17 in react attributes\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.17",
+      "tag": "@visactor/vrender-core_v0.19.17",
+      "date": "Fri, 05 Jul 2024 17:26:17 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.16",
+      "tag": "@visactor/vrender-core_v0.19.16",
+      "date": "Fri, 05 Jul 2024 14:29:15 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix syncState of label when re-render stage\n\n"
+          },
+          {
+            "comment": "fix: fix issue with setAttribute while play with startAt"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.15",
+      "tag": "@visactor/vrender-core_v0.19.15",
+      "date": "Fri, 28 Jun 2024 10:32:37 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix issue with area clip direction"
+          },
+          {
+            "comment": "feat: support `clip` effect for new points in tagPointsUpdate animation"
+          },
+          {
+            "comment": "fix: get default end props"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.14",
+      "tag": "@visactor/vrender-core_v0.19.14",
+      "date": "Wed, 26 Jun 2024 09:16:23 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support richtext editor"
+          },
+          {
+            "comment": "feat: upgrade @visactor/vutils"
+          },
+          {
+            "comment": "fix: fix issue with rect bounds while the wh is not setted"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.13",
+      "tag": "@visactor/vrender-core_v0.19.13",
+      "date": "Tue, 25 Jun 2024 11:17:14 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix issue with stage while it is released"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.12",
+      "tag": "@visactor/vrender-core_v0.19.12",
+      "date": "Fri, 21 Jun 2024 06:52:50 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.11",
+      "tag": "@visactor/vrender-core_v0.19.11",
+      "date": "Fri, 14 Jun 2024 09:50:59 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.10",
+      "tag": "@visactor/vrender-core_v0.19.10",
+      "date": "Thu, 13 Jun 2024 09:52:46 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat(streamLight): streamLight support direction and  parent support x1y1 attribute. close@Visactor/VChart#2734"
+          },
+          {
+            "comment": "fix: fix issue with interploate while color is array"
+          },
+          {
+            "comment": "fix: only clear animation when has no state animation"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.9",
+      "tag": "@visactor/vrender-core_v0.19.9",
+      "date": "Wed, 05 Jun 2024 12:25:00 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.8",
+      "tag": "@visactor/vrender-core_v0.19.8",
+      "date": "Wed, 05 Jun 2024 08:24:28 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.7",
+      "tag": "@visactor/vrender-core_v0.19.7",
+      "date": "Tue, 04 Jun 2024 11:10:08 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix `useStates` of glyph\n\n"
+          },
+          {
+            "comment": "feat: image support stroke and border, closed #1242"
+          },
+          {
+            "comment": "fix: fix env check in micro frontend env"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.6",
+      "tag": "@visactor/vrender-core_v0.19.6",
+      "date": "Wed, 29 May 2024 06:57:11 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix issue with color array interpolate"
+          },
+          {
+            "comment": "fix: fix issue with detailPath that list will not be cleard"
+          },
+          {
+            "comment": "fix: fix issue with _nodeList while removeAllChild"
+          },
+          {
+            "comment": "fix: fix issue with unTap"
+          },
+          {
+            "comment": "fix: fix animation of state change\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.5",
+      "tag": "@visactor/vrender-core_v0.19.5",
+      "date": "Fri, 24 May 2024 09:21:23 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.4",
+      "tag": "@visactor/vrender-core_v0.19.4",
+      "date": "Fri, 17 May 2024 06:46:41 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support harmony env"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.3",
+      "tag": "@visactor/vrender-core_v0.19.3",
+      "date": "Fri, 10 May 2024 09:24:39 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support baseOpacity for group"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.2",
+      "tag": "@visactor/vrender-core_v0.19.2",
+      "date": "Thu, 09 May 2024 12:26:00 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: event support detailPath"
+          },
+          {
+            "comment": "feat: support pauseTriggerEvent to pause stage event trigger"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.1",
+      "tag": "@visactor/vrender-core_v0.19.1",
+      "date": "Wed, 08 May 2024 08:47:35 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: rename forceBreakLine to disableAutoWrapLine"
+          },
+          {
+            "comment": "fix: fix issue with disableAutoWrapLine ellipsis"
+          },
+          {
+            "comment": "fix: fix issue with interactive graphic while base graphic is removed"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.19.0",
       "tag": "@visactor/vrender-core_v0.19.0",
       "date": "Tue, 30 Apr 2024 08:40:53 GMT",

@@ -4,10 +4,17 @@ group: graphic-rect
 title: basic-rect
 keywords: rect
 order: 1-0
-cover: http://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/rect-basic.png
+cover: https://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/rect-basic.png
 ---
 
 # rect graphic
+
+The `Rect` (rectangle) primitive is a basic graphic element used to represent rectangular or square shapes. It is widely used in computer graphics, graphic design, and data visualization due to its simplicity and ease of use.
+
+Key features:
+- Position: Rectangles are typically defined by the coordinates of their top-left corner, determining their position in the coordinate system.
+- Width and Height: The size of a rectangle is determined by its width and height, which can be any positive value, creating rectangles of different sizes.
+- Border and Fill: Rectangles can have border colors, styles, and thickness set, and can also have a fill color to enhance visual effects.
 
 ## code demo
 

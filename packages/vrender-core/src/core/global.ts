@@ -24,10 +24,19 @@ export class DefaultGlobal implements IGlobal {
   private _env: EnvType;
   private _isSafari?: boolean;
   private _isChrome?: boolean;
+  private _isImageAnonymous?: boolean = true;
   get env(): EnvType {
     return this._env;
   }
   private envContribution: IEnvContribution;
+
+  get isImageAnonymous(): boolean {
+    return this._isImageAnonymous;
+  }
+
+  set isImageAnonymous(isImageAnonymous: boolean) {
+    this._isImageAnonymous = isImageAnonymous;
+  }
 
   get devicePixelRatio(): number {
     if (!this._env) {
@@ -345,6 +354,13 @@ export class DefaultGlobal implements IGlobal {
       this.setEnv('browser');
     }
     return this.envContribution.loadBlob(url);
+  }
+
+  async loadFont(name: string, source: string | BinaryData, descriptors?: FontFaceDescriptors) {
+    if (!this._env) {
+      this.setEnv('browser');
+    }
+    return this.envContribution.loadFont(name, source, descriptors);
   }
 
   isChrome(): boolean {

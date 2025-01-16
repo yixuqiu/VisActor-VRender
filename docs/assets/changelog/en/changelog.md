@@ -1,3 +1,876 @@
+# v0.21.7
+
+2024-12-25
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: support polygon sector crosshair for non-smooth angle axis
+- **@visactor/vrender-components**: add switch component
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: upgrade vutils to 0.19.3
+- **@visactor/react-vrender-utils**: upgrade vutils to 0.19.3
+- **@visactor/react-vrender**: upgrade vutils to 0.19.3
+- **@visactor/vrender-kits**: upgrade vutils to 0.19.3
+- **@visactor/vrender-core**: upgrade vutils to 0.19.3
+- **@visactor/vrender**: upgrade vutils to 0.19.3
+
+**🔖 other**
+
+- **@visactor/vrender-components**: Revert "fix: fix the bug of axis pickable"
+
+This reverts commit 55637a84c01f7af8f4b64ccdfc8cd7215a257c03.
+
+
+
+[more detail about v0.21.7](https://github.com/VisActor/VRender/releases/tag/v0.21.7)
+
+# v0.21.6
+
+2024-12-25
+
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: add onBeforeAttributeUpdate in base-component
+- **@visactor/vrender-components**: fix the bug of axis pickable
+- **@visactor/vrender-core**: fix issue with stroke clip
+
+
+
+[more detail about v0.21.6](https://github.com/VisActor/VRender/releases/tag/v0.21.6)
+
+# v0.21.5
+
+2024-12-24
+
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-core**: fix issue with image background stroke, closed [#1640](https://github.com/VisActor/VRender/issues/1640)
+
+
+
+[more detail about v0.21.5](https://github.com/VisActor/VRender/releases/tag/v0.21.5)
+
+# v0.21.4
+
+2024-12-23
+
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-kits**: fix issue with gesture emitEvent when gesture is released
+
+
+
+[more detail about v0.21.4](https://github.com/VisActor/VRender/releases/tag/v0.21.4)
+
+# v0.21.3
+
+2024-12-23
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: optimization legend layout in isHorizontal
+- **@visactor/vrender-kits**: support loadFont
+- **@visactor/vrender-core**: support loadFont
+- **@visactor/vrender-core**: support penetrateEventList
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: axis break should filter ticks when set `tickStep`
+- **@visactor/vrender-components**: obb autoHide should support autoHideSeparation(without rotate)
+- **@visactor/vrender-components**: label overlapPadding not work correctly
+- **@visactor/vrender-components**: optimize the performance of ticks in time-scale
+- **@visactor/vrender-core**: fix issue with image stroke and background
+- **@visactor/vrender-core**: fix issue with html when include interactive layer
+- **@visactor/vrender-core**: fix issue with richtext not support setShadowBlendStyle
+- **@visactor/vrender-core**: optimize the performance of ticks in time-scale
+
+[more detail about v0.21.3](https://github.com/VisActor/VRender/releases/tag/v0.21.3)
+
+# v0.21.1
+
+2024-12-05
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: support `restorePosition` in position/bound label overlap strategy
+- **@visactor/vrender-components**: support vertex point of marker area label. close @VisActor/VChart[#3442](https://github.com/VisActor/VRender/issues/3442)
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: end symbol angle when arc line in markpoint. fix @VisActor/VChart[#3427](https://github.com/VisActor/VRender/issues/3427)
+- **@visactor/vrender-components**: fix issue with scroll-plugin
+- **@visactor/vrender-core**: fix issue with insertAfter and insertBefore
+- **@visactor/vrender-core**: fix the issue when line is configured to connect, closed [#3238](https://github.com/VisActor/VRender/issues/3238)
+- **@visactor/vrender-core**: fix issue with richtext setAttribute, closed [#1578](https://github.com/VisActor/VRender/issues/1578)
+- **@visactor/vrender-core**: fix issue with richtext default font
+
+
+
+[more detail about v0.21.1](https://github.com/VisActor/VRender/releases/tag/v0.21.1)
+
+# v0.21.0
+
+2024-12-05
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: support label overlap for inside arc labels
+- **@visactor/vrender-core**: use ascend and decent to make measure more accurate
+- **@visactor/vrender-core**: sync animated attribute while call render func, closed [#1416](https://github.com/VisActor/VRender/issues/1416)
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-core**: smooth out stuttering effects when multiple TagPointsUpdate instances execute concurrently
+- **@visactor/vrender-core**: fix issue with dirtyBounds incorrectly while set visible
+
+
+
+[more detail about v0.21.0](https://github.com/VisActor/VRender/releases/tag/v0.21.0)
+
+# v0.20.16
+
+2024-11-25
+
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-core**: fix issue with _debug_bounds
+- **@visactor/vrender-core**: fix issue with string linear-gradient
+- **@visactor/vrender-core**: fix issue where not work when lineWidth is set to 0
+- **@visactor/vrender-core**: fix drawing issue when size is array
+
+
+
+[more detail about v0.20.16](https://github.com/VisActor/VRender/releases/tag/v0.20.16)
+
+# v0.20.15
+
+2024-11-21
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-core**: support keepStrokeScale
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-kits**: fix press in andiord
+
+
+
+[more detail about v0.20.15](https://github.com/VisActor/VRender/releases/tag/v0.20.15)
+
+# v0.20.14
+
+2024-11-13
+
+
+**What's Changed**
+
+* fix: incorrect default hover trigger of discrete legend by @xiaoluoHe in https://github.com/VisActor/VRender/pull/1550
+
+**Full Changelog**: https://github.com/VisActor/VRender/compare/v0.20.13...v0.20.14
+
+[more detail about v0.20.14](https://github.com/VisActor/VRender/releases/tag/v0.20.14)
+
+# v0.20.13
+
+2024-11-13
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: support custom event trigger in discrete legend
+- **@visactor/vrender-components**: support scrollMask in scroll type discrete legend
+- **@visactor/vrender-core**: support auto refresh plugin
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: fix the issue of the legend scrollbar being clipped when positioned left or right
+- **@visactor/vrender-components**: fix smartInvert of gradient bar
+- **@visactor/vrender-kits**: fix trigger of press in mobile
+- **@visactor/vrender-core**: fix issue with text clip
+- **@visactor/vrender**: fix trigger of press in mobile
+
+**🔨 Refactor**
+
+- **@visactor/vrender-components**: optimize the scroll effect of discrete legend
+
+
+
+[more detail about v0.20.13](https://github.com/VisActor/VRender/releases/tag/v0.20.13)
+
+# v0.20.12
+
+2024-10-31
+
+
+**What's Changed**
+
+* feat: upgrade vutils to ~0.18.18 by @neuqzxy in https://github.com/VisActor/VRender/pull/1528
+
+
+**Full Changelog**: https://github.com/VisActor/VRender/compare/v0.20.11...v0.20.12
+
+[more detail about v0.20.12](https://github.com/VisActor/VRender/releases/tag/v0.20.12)
+
+# v0.20.11
+
+2024-10-31
+
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: optimize limit length calculation for line axis label autoWrap
+- **@visactor/vrender-components**: fix bounds of circle axis
+- **@visactor/vrender-components**: last page is empty in legend. fix@VisActor/VChart[#3344](https://github.com/VisActor/VRender/issues/3344)
+- **@visactor/vrender-core**: fix group fill gradient [#1518](https://github.com/VisActor/VRender/issues/1518)
+- **@visactor/vrender-core**: annotate the Ramer Douglas Peucker algorithm in point optimization
+
+
+
+[more detail about v0.20.11](https://github.com/VisActor/VRender/releases/tag/v0.20.11)
+
+# v0.20.10
+
+2024-10-25
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-core**: support fillStrokeOrder, closed [#1505](https://github.com/VisActor/VRender/issues/1505)
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-core**: fix issue with parse m where multi pos follow, closed [#1490](https://github.com/VisActor/VRender/issues/1490)
+- **@visactor/vrender-core**: fix the accuracy issue of number matching, closed [#1488](https://github.com/VisActor/VRender/issues/1488)
+
+
+
+[more detail about v0.20.10](https://github.com/VisActor/VRender/releases/tag/v0.20.10)
+
+# v0.20.9
+
+2024-10-15
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: support axis label `firstVisible` in autoHide and linear axis sampling
+- **@visactor/vrender-components**: add `interactInvertType` for smartInvert
+- **@visactor/vrender-core**: text support keep-all, closed [#1466](https://github.com/VisActor/VRender/issues/1466)
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: fix smartInvert when `outsideEnable` is true
+- **@visactor/vrender-components**: fix max width of arc label in left
+- **@visactor/vrender-components**: fix `pager.space` of discrete legend
+- **@visactor/vrender-components**: fix smart invert when only has intercet width base mark
+- **@visactor/vrender-components**: fix `legend.item.label.space` when has value
+- **@visactor/vrender-components**: legend scroll critical value leads last page not render. fix@VisActor/VChart[#3172](https://github.com/VisActor/VRender/issues/3172)
+- **@visactor/vrender-kits**: fix max width of arc label in left
+- **@visactor/vrender-core**: fix max width of arc label in left
+
+
+
+[more detail about v0.20.9](https://github.com/VisActor/VRender/releases/tag/v0.20.9)
+
+# v0.20.8
+
+2024-09-30
+
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-core**: fix line bounds with defined false, closed [#1463](https://github.com/VisActor/VRender/issues/1463)
+
+
+
+[more detail about v0.20.8](https://github.com/VisActor/VRender/releases/tag/v0.20.8)
+
+# v0.20.7
+
+2024-09-27
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: legend support roam scroll. close@VisActor/VChart[#3254](https://github.com/VisActor/VRender/issues/3254)
+
+[more detail about v0.20.7](https://github.com/VisActor/VRender/releases/tag/v0.20.7)
+
+# v0.20.6
+
+2024-09-26
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: support obb text bounds to enhance autoHide effect
+- **@visactor/vrender-core**: support obb bounds in text graphic
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: fix limit width of arc label when has customized align offset
+- **@visactor/vrender-components**: fix error of `alternateColor`
+- **@visactor/vrender-components**: outside label should not apply `smartInvert`
+- **@visactor/vrender-components**: fix `boundsPadding` of legend focus icon
+- **@visactor/vrender-core**: fix customPath of arc
+- **@visactor/vrender-core**: fix issue with interactive graphic while parent was removed
+- **@visactor/vrender-core**: line segment update animation result error
+
+
+
+[more detail about v0.20.6](https://github.com/VisActor/VRender/releases/tag/v0.20.6)
+
+# v0.20.5
+
+2024-09-20
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-core**: poptip suppport multiline text, closed [#1444](https://github.com/VisActor/VRender/issues/1444)
+- **@visactor/vrender-core**: fix issue with richtext width on disableAutoWrapLine mode, support clip attr
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: update parameters
+- **@visactor/vrender-components**: fix maxLineWidth of arc label
+- **@visactor/vrender-components**: fix `textStyle` of data-zoom
+- **@visactor/vrender-core**: fix error of `bounds-contex` when use `arcTo` in customShape
+- **@visactor/vrender-core**: fix path string of arc, fix [#1434](https://github.com/VisActor/VRender/issues/1434)
+- **@visactor/vrender-core**: fix error of morphing animation in `multiToOneMorph`, fix [#1439](https://github.com/VisActor/VRender/issues/1439)
+- **@visactor/vrender**: add disableFill box color in checkbox and radio [#1437](https://github.com/VisActor/VRender/issues/1437)
+
+[more detail about v0.20.5](https://github.com/VisActor/VRender/releases/tag/v0.20.5)
+
+# v0.20.4
+
+2024-09-12
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-core**: pauseRender support pass count
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: fix the issue where labels are not drawn when the linelabel animation is enabled.
+- **@visactor/vrender-core**: add updateHoverIconState in richtext
+
+
+
+[more detail about v0.20.4](https://github.com/VisActor/VRender/releases/tag/v0.20.4)
+
+# v0.20.3
+
+2024-09-09
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: add `alignOffset` in arc-label, `line2MinLength` support customized callback
+- **@visactor/vrender-components**: support axis `breaks` for line axis
+- **@visactor/vrender-components**: support `autoWrap` in line axis label
+- **@visactor/vrender-components**: label component supports disable specific state animation
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: tag padding not work when label is rich text. fix@VisActor/VChart[#3151](https://github.com/VisActor/VRender/issues/3151)
+- **@visactor/vrender-core**: fix error of updateAABBbounds when morphing
+- **@visactor/vrender-core**: tag padding not work when label is rich text. fix@VisActor/VChart[#3151](https://github.com/VisActor/VRender/issues/3151)
+
+
+
+[more detail about v0.20.3](https://github.com/VisActor/VRender/releases/tag/v0.20.3)
+
+# v0.20.1
+
+2024-09-03
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: support position `inside-center` of arc label
+- **@visactor/vrender-components**: add necessary APIs to player component
+- **@visactor/vrender-components**: support line segments update animation in TagPointsUpdate custom animation
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: fix textAlign of label when set different angle
+- **@visactor/vrender-components**: indicator stop tooltip interaction. fix@VisActor/VChart[#3123](https://github.com/VisActor/VRender/issues/3123)
+- **@visactor/vrender-components**: segment line will cause incorrect label position
+- **@visactor/vrender-components**: fix issue with poptip memory while stage is released
+- **@visactor/vrender-core**: fix issue with poptip release
+- **@visactor/vrender-core**: fix issue with animate zero duration
+- **@visactor/vrender-core**: fix textAlign of label when set different angle
+- **@visactor/vrender-core**: fix memory leak problem in ResourceLoader
+- **@visactor/vrender-core**: fix issue with richtext edit plugin while defucus out of text
+
+**⚡ Performance optimization**
+
+- **@visactor/vrender-components**: optimize the performance of label component
+
+
+
+[more detail about v0.20.1](https://github.com/VisActor/VRender/releases/tag/v0.20.1)
+
+# v0.20.0
+
+2024-08-16
+
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: arc label line color should follow arc mark by default, related [#3067](https://github.com/VisActor/VRender/issues/3067)
+- **@visactor/vrender-components**: fix bug of auto-render when remove some graphics
+- **@visactor/vrender-components**: set container pick false to allow tooltip interactive
+- **@visactor/vrender-components**: fix issue with timeline animate duration compute
+- **@visactor/vrender-components**: optimize triangle symbols
+- **@visactor/react-vrender-utils**: fix bug of auto-render when remove some graphics
+- **@visactor/react-vrender-utils**: optimize triangle symbols
+- **@visactor/react-vrender**: fix bug of auto-render when remove some graphics
+- **@visactor/react-vrender**: optimize triangle symbols
+- **@visactor/vrender-kits**: fix bug of auto-render when remove some graphics
+- **@visactor/vrender-kits**: optimize triangle symbols
+- **@visactor/vrender-core**: fix bug of auto-render when remove some graphics
+- **@visactor/vrender-core**: optimize triangle symbols
+- **@visactor/vrender**: fix bug of auto-render when remove some graphics
+- **@visactor/vrender**: optimize triangle symbols
+
+**🔨 Refactor**
+
+- **@visactor/vrender-components**: optimize cornerRadius parse of arc
+- **@visactor/react-vrender-utils**: optimize cornerRadius parse of arc
+- **@visactor/react-vrender**: optimize cornerRadius parse of arc
+- **@visactor/vrender-kits**: optimize cornerRadius parse of arc
+- **@visactor/vrender-core**: optimize cornerRadius parse of arc
+- **@visactor/vrender-core**: remove polyfill from reflect-metadata
+- **@visactor/vrender**: optimize cornerRadius parse of arc
+
+
+
+[more detail about v0.20.0](https://github.com/VisActor/VRender/releases/tag/v0.20.0)
+
+# v0.19.24
+
+2024-08-14
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: support polygon of circle-axis
+- **@visactor/vrender-core**: support polygon of circle-axis
+- **@visactor/vrender-core**: support rect corner array with array stroke
+- **@visactor/vrender**: support polygon of circle-axis
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: fix wrong stroke style is applied to area
+- **@visactor/vrender-components**: improve slightly the accuracy of the pager size calculation, related [#3045](https://github.com/VisActor/VRender/issues/3045)
+- **@visactor/vrender-components**: fix issue with timeline appearAnimate opacity attr prevented by next animate
+- **@visactor/vrender-kits**: fix wrong stroke style is applied to area
+- **@visactor/vrender-core**: fix wrong stroke style is applied to area
+- **@visactor/vrender-core**: fix issue with baseOpacity equal to 0
+- **@visactor/vrender-core**: fix edge and corner stroke in createRectPath()
+- **@visactor/vrender-core**: fix issue with shadow group matrix
+- **@visactor/vrender-core**: fix issue with disableAutoWrapLine
+- **@visactor/vrender-core**: fix richtext icon pick range [#1362](https://github.com/VisActor/VRender/issues/1362)
+- **@visactor/vrender-core**: fix issue with richtext attribute update
+- **@visactor/vrender**: fix wrong stroke style is applied to area
+
+
+
+[more detail about v0.19.24](https://github.com/VisActor/VRender/releases/tag/v0.19.24)
+
+
+# v0.19.23
+
+2024-08-06
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-core**: fix picker of shadow root group
+
+[more detail about v0.19.23](https://github.com/VisActor/VRender/releases/tag/v0.19.23)
+
+# v0.19.22
+
+2024-08-06
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: support react and html of indicator
+- **@visactor/vrender-components**: support timeline component
+- **@visactor/vrender-core**: shadow graphic support pick group
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: fix issue with indicator autolimit
+- **@visactor/vrender-core**: fix issue with Event class in harmony event
+
+
+[more detail about v0.19.22](https://github.com/VisActor/VRender/releases/tag/v0.19.22)
+
+
+# v0.19.21
+
+2024-08-05
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: label line support custom path. feat @VisActor/VChart[#3000](https://github.com/VisActor/VRender/issues/3000)
+
+
+
+[more detail about v0.19.21](https://github.com/VisActor/VRender/releases/tag/v0.19.21)
+
+# v0.19.20
+
+2024-08-01
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-core**: support array cornerRadius, closed [#1322](https://github.com/VisActor/VRender/issues/1322)
+- **@visactor/vrender-core**: support catmull-rom and catmull-rom-closed curve, closed [#1320](https://github.com/VisActor/VRender/issues/1320)
+- **@visactor/vrender**: support array cornerRadius, closed [#1322](https://github.com/VisActor/VRender/issues/1322)
+
+
+
+[more detail about v0.19.20](https://github.com/VisActor/VRender/releases/tag/v0.19.20)
+
+# v0.19.19
+
+2024-07-25
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: marker label support custom shape. close @Visactor/VChart[#2959](https://github.com/VisActor/VRender/issues/2959)
+- **@visactor/vrender-core**: marker label support custom shape. close @Visactor/VChart[#2959](https://github.com/VisActor/VRender/issues/2959)
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: in vertical layout, if only one line can be displayed, the layout will be directly based on the width of the legend item itself
+- **@visactor/vrender-components**: markpoint target size compute error. fix@Visactor/VChart[#2766](https://github.com/VisActor/VRender/issues/2766)
+- **@visactor/vrender-core**: fixed the problem that the bounds calculation of line mark is wrong when the defiend of some points is false
+
+
+
+[more detail about v0.19.19](https://github.com/VisActor/VRender/releases/tag/v0.19.19)
+
+# v0.19.18
+
+2024-07-15
+
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-core**: support react 17 in react attributes
+
+
+
+[more detail about v0.19.18](https://github.com/VisActor/VRender/releases/tag/v0.19.18)
+
+# v0.19.17
+
+2024-07-11
+
+
+**What's Changed**
+
+* [Auto release] release 0.19.17 by @github-actions in https://github.com/VisActor/VRender/pull/1295
+
+
+**Full Changelog**: https://github.com/VisActor/VRender/compare/v0.19.16...v0.19.17
+
+[more detail about v0.19.17](https://github.com/VisActor/VRender/releases/tag/v0.19.17)
+
+# v0.19.16
+
+2024-07-10
+
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: fix the issue where the arc label is still truncated despite setting `ellipsis: false`
+- **@visactor/vrender-components**: fix syncState of label when re-render stage
+- **@visactor/vrender-core**: fix syncState of label when re-render stage
+- **@visactor/vrender-core**: fix issue with setAttribute while play with startAt
+
+
+
+[more detail about v0.19.16](https://github.com/VisActor/VRender/releases/tag/v0.19.16)
+
+# v0.19.15
+
+2024-07-01
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-core**: support `clip` effect for new points in tagPointsUpdate animation
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-core**: fix issue with area clip direction
+- **@visactor/vrender-core**: get default end props
+
+
+
+[more detail about v0.19.15](https://github.com/VisActor/VRender/releases/tag/v0.19.15)
+
+# v0.19.14
+
+2024-06-28
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: upgrade @visactor/vutils
+- **@visactor/react-vrender-utils**: upgrade @visactor/vutils
+- **@visactor/react-vrender**: upgrade @visactor/vutils
+- **@visactor/vrender-kits**: upgrade @visactor/vutils
+- **@visactor/vrender-core**: support richtext editor
+- **@visactor/vrender-core**: upgrade @visactor/vutils
+- **@visactor/vrender**: support richtext editor
+- **@visactor/vrender**: upgrade @visactor/vutils
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-core**: fix issue with rect bounds while the wh is not setted
+- **@visactor/vrender**: fix issue with rect bounds while the wh is not setted
+
+
+
+[more detail about v0.19.14](https://github.com/VisActor/VRender/releases/tag/v0.19.14)
+
+# v0.19.13
+
+2024-06-25
+
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-core**: fix issue with stage while it is released
+
+
+
+[more detail about v0.19.13](https://github.com/VisActor/VRender/releases/tag/v0.19.13)
+
+# v0.19.12
+
+2024-06-21
+
+fix: fix issue with stage while it is released [#1270](https://github.com/VisActor/VRender/issues/1270)
+
+
+
+[more detail about v0.19.12](https://github.com/VisActor/VRender/releases/tag/v0.19.12)
+
+# v0.19.11
+
+2024-06-17
+
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: fix position of canvas tooltip shape
+
+
+
+[more detail about v0.19.11](https://github.com/VisActor/VRender/releases/tag/v0.19.11)
+
+# v0.19.10
+
+2024-06-14
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: support `align` right of canvas tooltip
+- **streamLight**: streamLight support direction and  parent support x1y1 attribute. close@Visactor/VChart[#2734](https://github.com/VisActor/VRender/issues/2734)
+- **streamLight**: streamLight support direction and  parent support x1y1 attribute. close@Visactor/VChart[#2734](https://github.com/VisActor/VRender/issues/2734)
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-core**: fix issue with interploate while color is array
+- **@visactor/vrender-core**: only clear animation when has no state animation
+- **@visactor/vrender**: fix issue with interploate while color is array
+
+
+
+[more detail about v0.19.10](https://github.com/VisActor/VRender/releases/tag/v0.19.10)
+
+# v0.19.9
+
+2024-06-05
+
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: colorLegend handler cannot customize fill color
+
+
+
+[more detail about v0.19.9](https://github.com/VisActor/VRender/releases/tag/v0.19.9)
+
+# v0.19.8
+
+2024-06-05
+
+
+**What's Changed**
+
+* fix issue with https://github.com/VisActor/VRender/pull/1247
+* [Auto release] release 0.19.8 by @github-actions in https://github.com/VisActor/VRender/pull/1249
+
+
+**Full Changelog**: https://github.com/VisActor/VRender/compare/v0.19.7...v0.19.8
+
+[more detail about v0.19.8](https://github.com/VisActor/VRender/releases/tag/v0.19.8)
+
+# v0.19.7
+
+2024-06-04
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-core**: image support stroke and border, closed [#1242](https://github.com/VisActor/VRender/issues/1242)
+- **@visactor/vrender**: image support stroke and border, closed [#1242](https://github.com/VisActor/VRender/issues/1242)
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: fix useless re-render of datazoom and brush
+- **@visactor/vrender-core**: fix `useStates` of glyph
+- **@visactor/vrender-core**: fix env check in micro frontend env
+
+
+
+[more detail about v0.19.7](https://github.com/VisActor/VRender/releases/tag/v0.19.7)
+
+# v0.19.6
+
+2024-05-29
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: add empty-tip component
+
+**🐛 Bug fix**
+
+- **marker**: fix marker position and ref bad case. fix@visactor/vchart[#2721](https://github.com/VisActor/VRender/issues/2721)
+- **@visactor/vrender-components**: fix animation of state change
+- **@visactor/vrender-core**: fix issue with color array interpolate
+- **@visactor/vrender-core**: fix issue with detailPath that list will not be cleard
+- **@visactor/vrender-core**: fix issue with _nodeList while removeAllChild
+- **@visactor/vrender-core**: fix issue with unTap
+- **@visactor/vrender-core**: fix animation of state change
+
+
+
+[more detail about v0.19.6](https://github.com/VisActor/VRender/releases/tag/v0.19.6)
+
+# v0.19.5
+
+2024-05-24
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: add \`containerTextAlign\` for tag component
+
+
+
+[more detail about v0.19.5](https://github.com/VisActor/VRender/releases/tag/v0.19.5)
+
+# v0.19.4
+
+2024-05-20
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: add  scrollbar propagation spec to allow close stop propagation
+- **@visactor/vrender-components**: support harmony env
+- **marker**: mark point support arc and target item. close@VisActor/VChart[#2590](https://github.com/VisActor/VRender/issues/2590)
+- **player**: index can be looped when set backward or forward button in player if user config loop. close@Vi
+- **@visactor/vrender-kits**: support harmony env
+- **@visactor/vrender-core**: support harmony env
+- **@visactor/vrender**: support harmony env
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-components**: fix error of arc label
+- **@visactor/vrender-components**: fix error of tooltip when rich text is empty
+- **legend**: active item error when rerender legend. fix@VisActor/VChart[#2690](https://github.com/VisActor/VRender/issues/2690)
+
+
+
+[more detail about v0.19.4](https://github.com/VisActor/VRender/releases/tag/v0.19.4)
+
+# v0.19.3
+
+2024-05-10
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-kits**: support baseOpacity for group
+- **@visactor/vrender-core**: support baseOpacity for group
+
+
+
+[more detail about v0.19.3](https://github.com/VisActor/VRender/releases/tag/v0.19.3)
+
+# v0.19.2
+
+2024-05-09
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-components**: support `focus` mode in discrete legend
+- **@visactor/vrender-kits**: support tt env, closed [#1129](https://github.com/VisActor/VRender/issues/1129)
+- **@visactor/vrender-core**: event support detailPath
+- **@visactor/vrender-core**: support pauseTriggerEvent to pause stage event trigger
+
+
+
+[more detail about v0.19.2](https://github.com/VisActor/VRender/releases/tag/v0.19.2)
+
+# v0.19.1
+
+2024-05-08
+
+
+**🆕 New feature**
+
+- **@visactor/vrender-core**: rename forceBreakLine to disableAutoWrapLine
+
+**🐛 Bug fix**
+
+- **@visactor/vrender-core**: fix issue with disableAutoWrapLine ellipsis
+- **@visactor/vrender-core**: fix issue with interactive graphic while base graphic is removed
+
+
+
+[more detail about v0.19.1](https://github.com/VisActor/VRender/releases/tag/v0.19.1)
+
 # v0.19.0
 
 2024-04-30

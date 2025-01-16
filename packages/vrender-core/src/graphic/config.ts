@@ -1,36 +1,37 @@
 // 存放公共属性
 import { Logger, Matrix, pi2 } from '@visactor/vutils';
 import { CustomPath2D } from '../common/custom-path2d';
-import type {
-  IArcGraphicAttribute,
-  IAreaGraphicAttribute,
-  IGraphicAttribute,
-  ICircleGraphicAttribute,
-  IFillStyle,
-  IGlyphGraphicAttribute,
-  IGroupGraphicAttribute,
-  IImageGraphicAttribute,
-  ILineGraphicAttribute,
-  IPathGraphicAttribute,
-  IPolygonGraphicAttribute,
-  IRect3dGraphicAttribute,
-  IRectGraphicAttribute,
-  IStrokeStyle,
-  IGraphicStyle,
-  ISymbolGraphicAttribute,
-  ITextAttribute,
-  ITextGraphicAttribute,
-  IRichTextGraphicAttribute,
-  ITransform,
-  RichTextWordBreak,
-  RichTextVerticalDirection,
-  RichTextGlobalAlignType,
-  RichTextGlobalBaselineType,
-  IRichTextIconGraphicAttribute,
-  IConnectedStyle,
-  ILayout,
-  IDebugType,
-  IPickStyle
+import {
+  type IArcGraphicAttribute,
+  type IAreaGraphicAttribute,
+  type IGraphicAttribute,
+  type ICircleGraphicAttribute,
+  type IFillStyle,
+  type IGlyphGraphicAttribute,
+  type IGroupGraphicAttribute,
+  type IImageGraphicAttribute,
+  type ILineGraphicAttribute,
+  type IPathGraphicAttribute,
+  type IPolygonGraphicAttribute,
+  type IRect3dGraphicAttribute,
+  type IRectGraphicAttribute,
+  type IStrokeStyle,
+  type IGraphicStyle,
+  type ISymbolGraphicAttribute,
+  type ITextAttribute,
+  type ITextGraphicAttribute,
+  type IRichTextGraphicAttribute,
+  type ITransform,
+  type RichTextWordBreak,
+  type RichTextVerticalDirection,
+  type RichTextGlobalAlignType,
+  type RichTextGlobalBaselineType,
+  type IRichTextIconGraphicAttribute,
+  type IConnectedStyle,
+  type ILayout,
+  type IDebugType,
+  type IPickStyle,
+  MeasureModeEnum
 } from '../interface';
 
 export const DefaultLayout: ILayout = {
@@ -88,6 +89,7 @@ export const DefaultStrokeStyle: IStrokeStyle = {
 export const DefaultTextStyle: Required<ITextAttribute> = {
   text: '',
   maxLineWidth: Infinity,
+  maxWidth: Infinity,
   textAlign: 'left',
   textBaseline: 'alphabetic',
   fontSize: 16,
@@ -113,7 +115,9 @@ export const DefaultTextStyle: Required<ITextAttribute> = {
   suffixPosition: 'end',
   underlineDash: [],
   underlineOffset: 0,
-  disableAutoClipedPoptip: undefined
+  disableAutoClipedPoptip: undefined,
+  measureMode: MeasureModeEnum.fontBounding,
+  keepCenterInLine: false
 };
 
 export const DefaultPickStyle: IPickStyle = {
@@ -169,6 +173,7 @@ export const DefaultAttribute: Required<IGraphicAttribute> = {
   strokeSeg: null,
   renderable: true,
   pickable: true,
+  shadowGraphic: undefined,
   childrenPickable: true,
   fillPickable: true,
   strokePickable: true,
@@ -176,6 +181,7 @@ export const DefaultAttribute: Required<IGraphicAttribute> = {
   zIndex: 0,
   layout: null,
   boundsPadding: 0,
+  fillStrokeOrder: 0,
   renderStyle: 'default',
   pickMode: 'accurate',
   customPickShape: null,
@@ -185,6 +191,8 @@ export const DefaultAttribute: Required<IGraphicAttribute> = {
   globalZIndex: 1,
   globalCompositeOperation: '',
   overflow: 'hidden',
+  shadowPickMode: 'graphic',
+  keepStrokeScale: false,
   ...DefaultDebugAttribute,
   ...DefaultStyle,
   ...DefaultTransform
@@ -221,7 +229,8 @@ export const DefaultAreaAttribute: Required<IAreaGraphicAttribute> = {
   segments: [],
   curveType: 'linear',
   clipRange: 1,
-  closePath: false
+  closePath: false,
+  curveTension: 1
 };
 
 export const DefaultCircleAttribute: Required<ICircleGraphicAttribute> = {
@@ -244,7 +253,8 @@ export const DefaultGroupAttribute: Required<IGroupGraphicAttribute> = {
   flexWrap: 'wrap',
   justifyContent: 'flex-start',
   alignItems: 'flex-start',
-  alignContent: 'flex-start'
+  alignContent: 'flex-start',
+  baseOpacity: 1
 };
 
 export const DefaultGlyphAttribute: Required<IGlyphGraphicAttribute> = {
@@ -264,12 +274,14 @@ export const DefaultLineAttribute: Required<ILineGraphicAttribute> = {
   curveType: 'linear',
   clipRange: 1,
   clipRangeByDimension: 'default',
-  closePath: false
+  closePath: false,
+  curveTension: 1
 };
 
 export const DefaultPathAttribute: Required<IPathGraphicAttribute> = {
   ...DefaultAttribute,
   path: new CustomPath2D(),
+  fillStrokeOrder: 1,
   customPath: () => {
     Logger.getInstance().warn('空函数');
   }
@@ -319,6 +331,7 @@ export const DefaultTextAttribute: Required<ITextGraphicAttribute> = {
 export const DefaultRichTextAttribute: Required<IRichTextGraphicAttribute> = {
   ...DefaultAttribute,
   ...DefaultTextStyle,
+  editable: false,
   width: 300,
   height: 300,
   ellipsis: true,
@@ -328,7 +341,7 @@ export const DefaultRichTextAttribute: Required<IRichTextGraphicAttribute> = {
   textBaseline: 'top' as RichTextGlobalBaselineType,
   layoutDirection: 'horizontal',
   textConfig: [],
-  forceBreakLine: false,
+  disableAutoWrapLine: false,
   maxHeight: undefined,
   maxWidth: undefined,
   singleLine: false

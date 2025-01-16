@@ -1,6 +1,291 @@
 # Change Log - @visactor/react-vrender-utils
 
-This log was last generated on Tue, 30 Apr 2024 08:40:53 GMT and should not be manually modified.
+This log was last generated on Wed, 15 Jan 2025 12:13:28 GMT and should not be manually modified.
+
+## 0.21.11
+Wed, 15 Jan 2025 12:13:28 GMT
+
+_Version update only_
+
+## 0.21.10
+Wed, 15 Jan 2025 03:14:32 GMT
+
+_Version update only_
+
+## 0.21.9
+Mon, 13 Jan 2025 03:23:50 GMT
+
+_Version update only_
+
+## 0.21.8
+Mon, 06 Jan 2025 11:07:36 GMT
+
+_Version update only_
+
+## 0.21.7
+Wed, 25 Dec 2024 07:53:11 GMT
+
+### Updates
+
+- fix: upgrade vutils to 0.19.3
+
+
+
+## 0.21.6
+Tue, 24 Dec 2024 12:46:37 GMT
+
+_Version update only_
+
+## 0.21.5
+Tue, 24 Dec 2024 07:53:11 GMT
+
+_Version update only_
+
+## 0.21.4
+Mon, 23 Dec 2024 10:16:00 GMT
+
+_Version update only_
+
+## 0.21.3
+Mon, 23 Dec 2024 08:28:14 GMT
+
+_Version update only_
+
+## 0.21.2
+Thu, 12 Dec 2024 10:23:51 GMT
+
+_Version update only_
+
+## 0.21.1
+Thu, 05 Dec 2024 07:50:46 GMT
+
+_Version update only_
+
+## 0.21.0
+Thu, 28 Nov 2024 03:30:36 GMT
+
+_Version update only_
+
+## 0.20.16
+Thu, 21 Nov 2024 06:58:23 GMT
+
+_Version update only_
+
+## 0.20.15
+Fri, 15 Nov 2024 08:34:34 GMT
+
+_Version update only_
+
+## 0.20.14
+Wed, 13 Nov 2024 07:47:15 GMT
+
+_Version update only_
+
+## 0.20.13
+Wed, 13 Nov 2024 06:35:02 GMT
+
+_Version update only_
+
+## 0.20.12
+Thu, 31 Oct 2024 02:49:49 GMT
+
+_Version update only_
+
+## 0.20.11
+Wed, 30 Oct 2024 13:10:03 GMT
+
+_Version update only_
+
+## 0.20.10
+Wed, 23 Oct 2024 08:37:33 GMT
+
+_Version update only_
+
+## 0.20.9
+Tue, 15 Oct 2024 03:50:15 GMT
+
+_Version update only_
+
+## 0.20.8
+Sun, 29 Sep 2024 09:44:02 GMT
+
+_Version update only_
+
+## 0.20.7
+Fri, 27 Sep 2024 03:22:31 GMT
+
+_Version update only_
+
+## 0.20.6
+Thu, 26 Sep 2024 09:28:35 GMT
+
+_Version update only_
+
+## 0.20.5
+Fri, 20 Sep 2024 06:37:57 GMT
+
+### Updates
+
+- fix: fix path string of arc, fix #1434
+
+
+
+## 0.20.4
+Thu, 12 Sep 2024 07:33:20 GMT
+
+_Version update only_
+
+## 0.20.3
+Sat, 07 Sep 2024 09:16:33 GMT
+
+_Version update only_
+
+## 0.20.2
+Wed, 04 Sep 2024 12:52:31 GMT
+
+_Version update only_
+
+## 0.20.1
+Fri, 30 Aug 2024 09:55:07 GMT
+
+_Version update only_
+
+## 0.20.0
+Thu, 15 Aug 2024 07:26:54 GMT
+
+### Updates
+
+- fix: fix bug of auto-render when remove some graphics
+
+
+- fix: optimize triangle symbols
+
+
+- refactor: optimize cornerRadius parse of arc
+
+
+
+## 0.19.24
+Tue, 13 Aug 2024 07:47:29 GMT
+
+_Version update only_
+
+## 0.19.23
+Tue, 06 Aug 2024 05:17:39 GMT
+
+_Version update only_
+
+## 0.19.22
+Mon, 05 Aug 2024 09:08:30 GMT
+
+_Version update only_
+
+## 0.19.21
+Mon, 05 Aug 2024 01:39:45 GMT
+
+_Version update only_
+
+## 0.19.20
+Wed, 31 Jul 2024 09:48:37 GMT
+
+_Version update only_
+
+## 0.19.19
+Tue, 23 Jul 2024 11:56:39 GMT
+
+_Version update only_
+
+## 0.19.18
+Fri, 12 Jul 2024 07:18:10 GMT
+
+_Version update only_
+
+## 0.19.17
+Fri, 05 Jul 2024 17:26:17 GMT
+
+_Version update only_
+
+## 0.19.16
+Fri, 05 Jul 2024 14:29:14 GMT
+
+_Version update only_
+
+## 0.19.15
+Fri, 28 Jun 2024 10:32:37 GMT
+
+_Version update only_
+
+## 0.19.14
+Wed, 26 Jun 2024 09:16:23 GMT
+
+### Updates
+
+- feat: upgrade @visactor/vutils
+
+## 0.19.13
+Tue, 25 Jun 2024 11:17:14 GMT
+
+_Version update only_
+
+## 0.19.12
+Fri, 21 Jun 2024 06:52:50 GMT
+
+_Version update only_
+
+## 0.19.11
+Fri, 14 Jun 2024 09:50:59 GMT
+
+_Version update only_
+
+## 0.19.10
+Thu, 13 Jun 2024 09:52:46 GMT
+
+_Version update only_
+
+## 0.19.9
+Wed, 05 Jun 2024 12:25:00 GMT
+
+_Version update only_
+
+## 0.19.8
+Wed, 05 Jun 2024 08:24:28 GMT
+
+_Version update only_
+
+## 0.19.7
+Tue, 04 Jun 2024 11:10:08 GMT
+
+_Version update only_
+
+## 0.19.6
+Wed, 29 May 2024 06:57:11 GMT
+
+_Version update only_
+
+## 0.19.5
+Fri, 24 May 2024 09:21:23 GMT
+
+_Version update only_
+
+## 0.19.4
+Fri, 17 May 2024 06:46:41 GMT
+
+_Version update only_
+
+## 0.19.3
+Fri, 10 May 2024 09:24:38 GMT
+
+_Version update only_
+
+## 0.19.2
+Thu, 09 May 2024 12:26:00 GMT
+
+_Version update only_
+
+## 0.19.1
+Wed, 08 May 2024 08:47:35 GMT
+
+_Version update only_
 
 ## 0.19.0
 Tue, 30 Apr 2024 08:40:52 GMT

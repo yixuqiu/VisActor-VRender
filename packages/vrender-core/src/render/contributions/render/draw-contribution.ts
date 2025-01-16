@@ -11,18 +11,16 @@ import type {
   IContributionProvider,
   IDrawItemInterceptorContribution,
   IDrawContribution,
-  IRenderSelector,
   IGlobal
 } from '../../../interface';
 import { findNextGraphic, foreach } from '../../../common/sort';
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import { ContributionProvider } from '../../../common/contribution-provider';
-import { DefaultAttribute } from '../../../graphic';
-import type { IAABBBounds, IBounds, IBoundsLike, IMatrix, IMatrixLike } from '@visactor/vutils';
-import { Bounds, Logger, getRectIntersect, isRectIntersect, last } from '@visactor/vutils';
-import { LayerService } from '../../../core/constants';
+import { DefaultAttribute } from '../../../graphic/config';
+import type { IAABBBounds, IBounds, IMatrix } from '@visactor/vutils';
+import { Bounds, Logger, getRectIntersect, isRectIntersect } from '@visactor/vutils';
 import { container } from '../../../container';
-import { GraphicRender, IncrementalDrawContribution, RenderSelector } from './symbol';
+import { GraphicRender, IncrementalDrawContribution } from './symbol';
 import { DrawItemInterceptor } from './draw-interceptor';
 import { createColor } from '../../../common/canvas-utils';
 import type { ILayerService } from '../../../interface/core';
@@ -47,6 +45,8 @@ export class DefaultDrawContribution implements IDrawContribution {
 
   declare global: IGlobal;
   declare layerService: ILayerService;
+
+  declare scrollMatrix?: IMatrix;
 
   constructor(
     // @inject(ContributionProvider)
@@ -349,23 +349,32 @@ export class DefaultDrawContribution implements IDrawContribution {
       return;
     }
 
-    let retrans: boolean = false;
-    let tempBounds: IAABBBounds;
+    let retrans: boolean = this.scrollMatrix && (this.scrollMatrix.e !== 0 || this.scrollMatrix.f !== 0);
+    let tempBounds: IBounds;
 
     if (graphic.parent) {
       const { scrollX = 0, scrollY = 0 } = graphic.parent.attribute;
-      retrans = !!(scrollX || scrollY);
-      if (retrans) {
-        tempBounds = this.dirtyBounds.clone();
-        // 变换dirtyBounds
-        const m = graphic.globalTransMatrix.getInverse();
-        this.dirtyBounds.copy(this.backupDirtyBounds).transformWithMatrix(m);
-        this.dirtyBounds.translate(-scrollX, -scrollY);
+      if (!!(scrollX || scrollY)) {
+        retrans = true;
+        if (!this.scrollMatrix) {
+          this.scrollMatrix = matrixAllocate.allocate(1, 0, 0, 1, 0, 0);
+        }
+        this.scrollMatrix.translate(-scrollX, -scrollY);
       }
     }
+    // 需要二次变化，那就重新算一个变换后的Bounds
+    if (retrans) {
+      tempBounds = this.dirtyBounds.clone().transformWithMatrix(this.scrollMatrix);
+    }
 
-    if (this.useDirtyBounds && !(graphic.isContainer || isRectIntersect(graphic.AABBBounds, this.dirtyBounds, false))) {
-      retrans && this.dirtyBounds.copy(tempBounds);
+    if (
+      this.useDirtyBounds &&
+      !(graphic.isContainer || isRectIntersect(graphic.AABBBounds, tempBounds ?? this.dirtyBounds, false))
+    ) {
+      if (retrans && graphic.parent) {
+        const { scrollX = 0, scrollY = 0 } = graphic.parent.attribute;
+        this.scrollMatrix && this.scrollMatrix.translate(scrollX, scrollY);
+      }
       return;
     }
 
@@ -380,7 +389,11 @@ export class DefaultDrawContribution implements IDrawContribution {
       renderer.draw(graphic, this.currentRenderService, drawContext, params);
     }
 
-    retrans && this.dirtyBounds.copy(tempBounds);
+    // retrans && this.dirtyBounds.copy(tempBounds);
+    if (retrans && graphic.parent) {
+      const { scrollX = 0, scrollY = 0 } = graphic.parent.attribute;
+      this.scrollMatrix && this.scrollMatrix.translate(scrollX, scrollY);
+    }
 
     // 添加拦截器
     if (this.InterceptorContributions.length) {

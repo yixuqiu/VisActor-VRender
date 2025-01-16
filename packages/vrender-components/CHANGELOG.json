@@ -2,6 +2,720 @@
   "name": "@visactor/vrender-components",
   "entries": [
     {
+      "version": "0.21.11",
+      "tag": "@visactor/vrender-components_v0.21.11",
+      "date": "Wed, 15 Jan 2025 12:13:28 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.21.10",
+      "tag": "@visactor/vrender-components_v0.21.10",
+      "date": "Wed, 15 Jan 2025 03:14:32 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: marker area support more position"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.9",
+      "tag": "@visactor/vrender-components_v0.21.9",
+      "date": "Mon, 13 Jan 2025 03:23:50 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: add GifImage component"
+          },
+          {
+            "comment": "fix: fix duplicate label issue after custom filtering with label dataFilter"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.8",
+      "tag": "@visactor/vrender-components_v0.21.8",
+      "date": "Mon, 06 Jan 2025 11:07:36 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: handle the additional logic of 3d arc label layout"
+          },
+          {
+            "comment": "fix: fix layout of title component\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.7",
+      "tag": "@visactor/vrender-components_v0.21.7",
+      "date": "Wed, 25 Dec 2024 07:53:11 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support polygon sector crosshair for non-smooth angle axis"
+          },
+          {
+            "comment": "feat: add switch component"
+          },
+          {
+            "comment": "Revert \"fix: fix the bug of axis pickable\"\n\nThis reverts commit 55637a84c01f7af8f4b64ccdfc8cd7215a257c03.\n\n"
+          },
+          {
+            "comment": "fix: upgrade vutils to 0.19.3\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.6",
+      "tag": "@visactor/vrender-components_v0.21.6",
+      "date": "Tue, 24 Dec 2024 12:46:37 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: add onBeforeAttributeUpdate in base-component"
+          },
+          {
+            "comment": "fix: fix the bug of axis pickable\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.5",
+      "tag": "@visactor/vrender-components_v0.21.5",
+      "date": "Tue, 24 Dec 2024 07:53:11 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.21.4",
+      "tag": "@visactor/vrender-components_v0.21.4",
+      "date": "Mon, 23 Dec 2024 10:16:00 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.21.3",
+      "tag": "@visactor/vrender-components_v0.21.3",
+      "date": "Mon, 23 Dec 2024 08:28:14 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: optimization legend layout in isHorizontal\n\n"
+          },
+          {
+            "comment": "fix: axis break should filter ticks when set `tickStep`\n\n"
+          },
+          {
+            "comment": "fix: obb autoHide should support autoHideSeparation(without rotate)"
+          },
+          {
+            "comment": "fix: label overlapPadding not work correctly"
+          },
+          {
+            "comment": "fix: optimize the performance of ticks in time-scale\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.2",
+      "tag": "@visactor/vrender-components_v0.21.2",
+      "date": "Thu, 12 Dec 2024 10:23:51 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support 'inside-middle' position for line-data label"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.1",
+      "tag": "@visactor/vrender-components_v0.21.1",
+      "date": "Thu, 05 Dec 2024 07:50:47 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support `restorePosition` in position/bound label overlap strategy"
+          },
+          {
+            "comment": "feat: support vertex point of marker area label. close @VisActor/VChart#3442"
+          },
+          {
+            "comment": "fix: end symbol angle when arc line in markpoint. fix @VisActor/VChart#3427"
+          },
+          {
+            "comment": "fix: fix issue with scroll-plugin"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.0",
+      "tag": "@visactor/vrender-components_v0.21.0",
+      "date": "Thu, 28 Nov 2024 03:30:36 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": " feat: support label overlap for inside arc labels"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.16",
+      "tag": "@visactor/vrender-components_v0.20.16",
+      "date": "Thu, 21 Nov 2024 06:58:23 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.20.15",
+      "tag": "@visactor/vrender-components_v0.20.15",
+      "date": "Fri, 15 Nov 2024 08:34:34 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.20.14",
+      "tag": "@visactor/vrender-components_v0.20.14",
+      "date": "Wed, 13 Nov 2024 07:47:16 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.20.13",
+      "tag": "@visactor/vrender-components_v0.20.13",
+      "date": "Wed, 13 Nov 2024 06:35:02 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support custom event trigger in discrete legend"
+          },
+          {
+            "comment": "feat: support scrollMask in scroll type discrete legend"
+          },
+          {
+            "comment": "refactor: optimize the scroll effect of discrete legend"
+          },
+          {
+            "comment": "fix: fix the issue of the legend scrollbar being clipped when positioned left or right"
+          },
+          {
+            "comment": "fix: fix smartInvert of gradient bar\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.12",
+      "tag": "@visactor/vrender-components_v0.20.12",
+      "date": "Thu, 31 Oct 2024 02:49:49 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.20.11",
+      "tag": "@visactor/vrender-components_v0.20.11",
+      "date": "Wed, 30 Oct 2024 13:10:03 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: optimize limit length calculation for line axis label autoWrap"
+          },
+          {
+            "comment": "fix: fix bounds of circle axis\n\n"
+          },
+          {
+            "comment": "fix: last page is empty in legend. fix@VisActor/VChart#3344"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.10",
+      "tag": "@visactor/vrender-components_v0.20.10",
+      "date": "Wed, 23 Oct 2024 08:37:33 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.20.9",
+      "tag": "@visactor/vrender-components_v0.20.9",
+      "date": "Tue, 15 Oct 2024 03:50:15 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix smartInvert when `outsideEnable` is true\n\n"
+          },
+          {
+            "comment": "feat: support axis label `firstVisible` in autoHide and linear axis sampling"
+          },
+          {
+            "comment": "feat: add `interactInvertType` for smartInvert\n\n"
+          },
+          {
+            "comment": "fix: fix max width of arc label in left\n\n"
+          },
+          {
+            "comment": "fix: fix `pager.space` of discrete legend\n\n"
+          },
+          {
+            "comment": "fix: fix smart invert when only has intercet width base mark\n\n"
+          },
+          {
+            "comment": "fix: fix `legend.item.label.space` when has value\n\n"
+          },
+          {
+            "comment": "fix: legend scroll critical value leads last page not render. fix@VisActor/VChart#3172"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.8",
+      "tag": "@visactor/vrender-components_v0.20.8",
+      "date": "Sun, 29 Sep 2024 09:44:02 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.20.7",
+      "tag": "@visactor/vrender-components_v0.20.7",
+      "date": "Fri, 27 Sep 2024 03:22:31 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: legend support roam scroll. close@VisActor/VChart#3254"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.6",
+      "tag": "@visactor/vrender-components_v0.20.6",
+      "date": "Thu, 26 Sep 2024 09:28:36 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": " feat: support obb text bounds to enhance autoHide effect"
+          },
+          {
+            "comment": "fix: fix limit width of arc label when has customized align offset\n\n"
+          },
+          {
+            "comment": "fix: fix error of `alternateColor`\n\n"
+          },
+          {
+            "comment": "fix: outside label should not apply `smartInvert`\n\n"
+          },
+          {
+            "comment": "fix: fix `boundsPadding` of legend focus icon\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.5",
+      "tag": "@visactor/vrender-components_v0.20.5",
+      "date": "Fri, 20 Sep 2024 06:37:57 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: update parameters"
+          },
+          {
+            "comment": "fix: fix maxLineWidth of arc label\n\n"
+          },
+          {
+            "comment": "fix: fix path string of arc, fix #1434\n\n"
+          },
+          {
+            "comment": "fix: fix `textStyle` of data-zoom\n\n"
+          },
+          {
+            "comment": "fix: fix error of morphing animation in `multiToOneMorph`, fix #1439\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.4",
+      "tag": "@visactor/vrender-components_v0.20.4",
+      "date": "Thu, 12 Sep 2024 07:33:20 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix the issue where labels are not drawn when the linelabel animation is enabled."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.3",
+      "tag": "@visactor/vrender-components_v0.20.3",
+      "date": "Sat, 07 Sep 2024 09:16:33 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: add `alignOffset` in arc-label, `line2MinLength` support customized callback\n\n"
+          },
+          {
+            "comment": "feat: support axis `breaks` for line axis"
+          },
+          {
+            "comment": "feat: support `autoWrap` in line axis label"
+          },
+          {
+            "comment": "feat: label component supports disable specific state animation"
+          },
+          {
+            "comment": "fix: tag padding not work when label is rich text. fix@VisActor/VChart#3151"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.2",
+      "tag": "@visactor/vrender-components_v0.20.2",
+      "date": "Wed, 04 Sep 2024 12:52:31 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.20.1",
+      "tag": "@visactor/vrender-components_v0.20.1",
+      "date": "Fri, 30 Aug 2024 09:55:07 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support position `inside-center` of arc label"
+          },
+          {
+            "comment": "feat: add necessary APIs to player component"
+          },
+          {
+            "comment": "fix: fix textAlign of label when set different angle\n\n"
+          },
+          {
+            "comment": "fix: indicator stop tooltip interaction. fix@VisActor/VChart#3123"
+          },
+          {
+            "comment": "fix: segment line will cause incorrect label position"
+          },
+          {
+            "comment": "fix: fix issue with poptip memory while stage is released"
+          },
+          {
+            "comment": "feat: support line segments update animation in TagPointsUpdate custom animation"
+          },
+          {
+            "comment": "perf: optimize the performance of label component"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.0",
+      "tag": "@visactor/vrender-components_v0.20.0",
+      "date": "Thu, 15 Aug 2024 07:26:54 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: arc label line color should follow arc mark by default, related #3067"
+          },
+          {
+            "comment": "fix: fix bug of auto-render when remove some graphics\n\n"
+          },
+          {
+            "comment": "fix: set container pick false to allow tooltip interactive"
+          },
+          {
+            "comment": "fix: fix issue with timeline animate duration compute"
+          },
+          {
+            "comment": "fix: optimize triangle symbols\n\n"
+          },
+          {
+            "comment": "refactor: optimize cornerRadius parse of arc\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.24",
+      "tag": "@visactor/vrender-components_v0.19.24",
+      "date": "Tue, 13 Aug 2024 07:47:29 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support polygon of circle-axis\n\n"
+          },
+          {
+            "comment": "fix: fix wrong stroke style is applied to area\n\n"
+          },
+          {
+            "comment": "fix: improve slightly the accuracy of the pager size calculation, related #3045"
+          },
+          {
+            "comment": "fix: fix issue with timeline appearAnimate opacity attr prevented by next animate"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.23",
+      "tag": "@visactor/vrender-components_v0.19.23",
+      "date": "Tue, 06 Aug 2024 05:17:39 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.22",
+      "tag": "@visactor/vrender-components_v0.19.22",
+      "date": "Mon, 05 Aug 2024 09:08:30 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support react and html of indicator\n\n"
+          },
+          {
+            "comment": "feat: support timeline component"
+          },
+          {
+            "comment": "fix: fix issue with indicator autolimit"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.21",
+      "tag": "@visactor/vrender-components_v0.19.21",
+      "date": "Mon, 05 Aug 2024 01:39:45 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: label line support custom path. feat @VisActor/VChart#3000"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.20",
+      "tag": "@visactor/vrender-components_v0.19.20",
+      "date": "Wed, 31 Jul 2024 09:48:37 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.19",
+      "tag": "@visactor/vrender-components_v0.19.19",
+      "date": "Tue, 23 Jul 2024 11:56:39 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: marker label support custom shape. close @Visactor/VChart#2959"
+          },
+          {
+            "comment": "fix: in vertical layout, if only one line can be displayed, the layout will be directly based on the width of the legend item itself"
+          },
+          {
+            "comment": "fix: markpoint target size compute error. fix@Visactor/VChart#2766"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.18",
+      "tag": "@visactor/vrender-components_v0.19.18",
+      "date": "Fri, 12 Jul 2024 07:18:10 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.17",
+      "tag": "@visactor/vrender-components_v0.19.17",
+      "date": "Fri, 05 Jul 2024 17:26:17 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.16",
+      "tag": "@visactor/vrender-components_v0.19.16",
+      "date": "Fri, 05 Jul 2024 14:29:15 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix the issue where the arc label is still truncated despite setting `ellipsis: false`"
+          },
+          {
+            "comment": "fix: fix syncState of label when re-render stage\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.15",
+      "tag": "@visactor/vrender-components_v0.19.15",
+      "date": "Fri, 28 Jun 2024 10:32:37 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.14",
+      "tag": "@visactor/vrender-components_v0.19.14",
+      "date": "Wed, 26 Jun 2024 09:16:23 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: upgrade @visactor/vutils"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.13",
+      "tag": "@visactor/vrender-components_v0.19.13",
+      "date": "Tue, 25 Jun 2024 11:17:14 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.12",
+      "tag": "@visactor/vrender-components_v0.19.12",
+      "date": "Fri, 21 Jun 2024 06:52:50 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.11",
+      "tag": "@visactor/vrender-components_v0.19.11",
+      "date": "Fri, 14 Jun 2024 09:50:59 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix position of canvas tooltip shape\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.10",
+      "tag": "@visactor/vrender-components_v0.19.10",
+      "date": "Thu, 13 Jun 2024 09:52:46 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support `align` right of canvas tooltip\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.9",
+      "tag": "@visactor/vrender-components_v0.19.9",
+      "date": "Wed, 05 Jun 2024 12:25:00 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: colorLegend handler cannot customize fill color"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.8",
+      "tag": "@visactor/vrender-components_v0.19.8",
+      "date": "Wed, 05 Jun 2024 08:24:28 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.7",
+      "tag": "@visactor/vrender-components_v0.19.7",
+      "date": "Tue, 04 Jun 2024 11:10:08 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix: fix useless re-render of datazoom and brush\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.6",
+      "tag": "@visactor/vrender-components_v0.19.6",
+      "date": "Wed, 29 May 2024 06:57:11 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: add empty-tip component\n\n"
+          },
+          {
+            "comment": "fix(marker): fix marker position and ref bad case. fix@visactor/vchart#2721"
+          },
+          {
+            "comment": "fix: fix animation of state change\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.5",
+      "tag": "@visactor/vrender-components_v0.19.5",
+      "date": "Fri, 24 May 2024 09:21:23 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: add \\`containerTextAlign\\` for tag component"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.4",
+      "tag": "@visactor/vrender-components_v0.19.4",
+      "date": "Fri, 17 May 2024 06:46:41 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: add  scrollbar propagation spec to allow close stop propagation"
+          },
+          {
+            "comment": "feat: support harmony env"
+          },
+          {
+            "comment": "feat(marker): mark point support arc and target item. close@VisActor/VChart#2590"
+          },
+          {
+            "comment": "feat(player): index can be looped when set backward or forward button in player if user config loop. close@Vi"
+          },
+          {
+            "comment": "fix: fix error of arc label\n\n"
+          },
+          {
+            "comment": "fix: fix error of tooltip when rich text is empty\n\n"
+          },
+          {
+            "comment": "fix(legend): active item error when rerender legend. fix@VisActor/VChart#2690"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.3",
+      "tag": "@visactor/vrender-components_v0.19.3",
+      "date": "Fri, 10 May 2024 09:24:38 GMT",
+      "comments": {}
+    },
+    {
+      "version": "0.19.2",
+      "tag": "@visactor/vrender-components_v0.19.2",
+      "date": "Thu, 09 May 2024 12:26:00 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "feat: support `focus` mode in discrete legend\n\n"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.1",
+      "tag": "@visactor/vrender-components_v0.19.1",
+      "date": "Wed, 08 May 2024 08:47:35 GMT",
+      "comments": {}
+    },
+    {
       "version": "0.19.0",
       "tag": "@visactor/vrender-components_v0.19.0",
       "date": "Tue, 30 Apr 2024 08:40:53 GMT",

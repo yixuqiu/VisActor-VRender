@@ -1,6 +1,485 @@
 # Change Log - @visactor/vrender-components
 
-This log was last generated on Tue, 30 Apr 2024 08:40:53 GMT and should not be manually modified.
+This log was last generated on Wed, 15 Jan 2025 12:13:28 GMT and should not be manually modified.
+
+## 0.21.11
+Wed, 15 Jan 2025 12:13:28 GMT
+
+_Version update only_
+
+## 0.21.10
+Wed, 15 Jan 2025 03:14:32 GMT
+
+### Updates
+
+- fix: marker area support more position
+
+## 0.21.9
+Mon, 13 Jan 2025 03:23:50 GMT
+
+### Updates
+
+- feat: add GifImage component
+- fix: fix duplicate label issue after custom filtering with label dataFilter
+
+## 0.21.8
+Mon, 06 Jan 2025 11:07:36 GMT
+
+### Updates
+
+- fix: handle the additional logic of 3d arc label layout
+- fix: fix layout of title component
+
+
+
+## 0.21.7
+Wed, 25 Dec 2024 07:53:11 GMT
+
+### Updates
+
+- feat: support polygon sector crosshair for non-smooth angle axis
+- feat: add switch component
+- Revert "fix: fix the bug of axis pickable"
+
+This reverts commit 55637a84c01f7af8f4b64ccdfc8cd7215a257c03.
+
+
+- fix: upgrade vutils to 0.19.3
+
+
+
+## 0.21.6
+Tue, 24 Dec 2024 12:46:37 GMT
+
+### Updates
+
+- fix: add onBeforeAttributeUpdate in base-component
+- fix: fix the bug of axis pickable
+
+
+
+## 0.21.5
+Tue, 24 Dec 2024 07:53:11 GMT
+
+_Version update only_
+
+## 0.21.4
+Mon, 23 Dec 2024 10:16:00 GMT
+
+_Version update only_
+
+## 0.21.3
+Mon, 23 Dec 2024 08:28:14 GMT
+
+### Updates
+
+- feat: optimization legend layout in isHorizontal
+
+
+- fix: axis break should filter ticks when set `tickStep`
+
+
+- fix: obb autoHide should support autoHideSeparation(without rotate)
+- fix: label overlapPadding not work correctly
+- fix: optimize the performance of ticks in time-scale
+
+
+
+## 0.21.2
+Thu, 12 Dec 2024 10:23:51 GMT
+
+### Updates
+
+- feat: support 'inside-middle' position for line-data label
+
+## 0.21.1
+Thu, 05 Dec 2024 07:50:47 GMT
+
+### Updates
+
+- feat: support `restorePosition` in position/bound label overlap strategy
+- feat: support vertex point of marker area label. close @VisActor/VChart#3442
+- fix: end symbol angle when arc line in markpoint. fix @VisActor/VChart#3427
+- fix: fix issue with scroll-plugin
+
+## 0.21.0
+Thu, 28 Nov 2024 03:30:36 GMT
+
+### Updates
+
+-  feat: support label overlap for inside arc labels
+
+## 0.20.16
+Thu, 21 Nov 2024 06:58:23 GMT
+
+_Version update only_
+
+## 0.20.15
+Fri, 15 Nov 2024 08:34:34 GMT
+
+_Version update only_
+
+## 0.20.14
+Wed, 13 Nov 2024 07:47:16 GMT
+
+_Version update only_
+
+## 0.20.13
+Wed, 13 Nov 2024 06:35:02 GMT
+
+### Updates
+
+- feat: support custom event trigger in discrete legend
+- feat: support scrollMask in scroll type discrete legend
+- refactor: optimize the scroll effect of discrete legend
+- fix: fix the issue of the legend scrollbar being clipped when positioned left or right
+- fix: fix smartInvert of gradient bar
+
+
+
+## 0.20.12
+Thu, 31 Oct 2024 02:49:49 GMT
+
+_Version update only_
+
+## 0.20.11
+Wed, 30 Oct 2024 13:10:03 GMT
+
+### Updates
+
+- fix: optimize limit length calculation for line axis label autoWrap
+- fix: fix bounds of circle axis
+
+
+- fix: last page is empty in legend. fix@VisActor/VChart#3344
+
+## 0.20.10
+Wed, 23 Oct 2024 08:37:33 GMT
+
+_Version update only_
+
+## 0.20.9
+Tue, 15 Oct 2024 03:50:15 GMT
+
+### Updates
+
+- fix: fix smartInvert when `outsideEnable` is true
+
+
+- feat: support axis label `firstVisible` in autoHide and linear axis sampling
+- feat: add `interactInvertType` for smartInvert
+
+
+- fix: fix max width of arc label in left
+
+
+- fix: fix `pager.space` of discrete legend
+
+
+- fix: fix smart invert when only has intercet width base mark
+
+
+- fix: fix `legend.item.label.space` when has value
+
+
+- fix: legend scroll critical value leads last page not render. fix@VisActor/VChart#3172
+
+## 0.20.8
+Sun, 29 Sep 2024 09:44:02 GMT
+
+_Version update only_
+
+## 0.20.7
+Fri, 27 Sep 2024 03:22:31 GMT
+
+### Updates
+
+- feat: legend support roam scroll. close@VisActor/VChart#3254
+
+## 0.20.6
+Thu, 26 Sep 2024 09:28:36 GMT
+
+### Updates
+
+-  feat: support obb text bounds to enhance autoHide effect
+- fix: fix limit width of arc label when has customized align offset
+
+
+- fix: fix error of `alternateColor`
+
+
+- fix: outside label should not apply `smartInvert`
+
+
+- fix: fix `boundsPadding` of legend focus icon
+
+
+
+## 0.20.5
+Fri, 20 Sep 2024 06:37:57 GMT
+
+### Updates
+
+- fix: update parameters
+- fix: fix maxLineWidth of arc label
+
+
+- fix: fix path string of arc, fix #1434
+
+
+- fix: fix `textStyle` of data-zoom
+
+
+- fix: fix error of morphing animation in `multiToOneMorph`, fix #1439
+
+
+
+## 0.20.4
+Thu, 12 Sep 2024 07:33:20 GMT
+
+### Updates
+
+- fix: fix the issue where labels are not drawn when the linelabel animation is enabled.
+
+## 0.20.3
+Sat, 07 Sep 2024 09:16:33 GMT
+
+### Updates
+
+- feat: add `alignOffset` in arc-label, `line2MinLength` support customized callback
+
+
+- feat: support axis `breaks` for line axis
+- feat: support `autoWrap` in line axis label
+- feat: label component supports disable specific state animation
+- fix: tag padding not work when label is rich text. fix@VisActor/VChart#3151
+
+## 0.20.2
+Wed, 04 Sep 2024 12:52:31 GMT
+
+_Version update only_
+
+## 0.20.1
+Fri, 30 Aug 2024 09:55:07 GMT
+
+### Updates
+
+- feat: support position `inside-center` of arc label
+- feat: add necessary APIs to player component
+- fix: fix textAlign of label when set different angle
+
+
+- fix: indicator stop tooltip interaction. fix@VisActor/VChart#3123
+- fix: segment line will cause incorrect label position
+- fix: fix issue with poptip memory while stage is released
+- feat: support line segments update animation in TagPointsUpdate custom animation
+- perf: optimize the performance of label component
+
+## 0.20.0
+Thu, 15 Aug 2024 07:26:54 GMT
+
+### Updates
+
+- fix: arc label line color should follow arc mark by default, related #3067
+- fix: fix bug of auto-render when remove some graphics
+
+
+- fix: set container pick false to allow tooltip interactive
+- fix: fix issue with timeline animate duration compute
+- fix: optimize triangle symbols
+
+
+- refactor: optimize cornerRadius parse of arc
+
+
+
+## 0.19.24
+Tue, 13 Aug 2024 07:47:29 GMT
+
+### Updates
+
+- feat: support polygon of circle-axis
+
+
+- fix: fix wrong stroke style is applied to area
+
+
+- fix: improve slightly the accuracy of the pager size calculation, related #3045
+- fix: fix issue with timeline appearAnimate opacity attr prevented by next animate
+
+## 0.19.23
+Tue, 06 Aug 2024 05:17:39 GMT
+
+_Version update only_
+
+## 0.19.22
+Mon, 05 Aug 2024 09:08:30 GMT
+
+### Updates
+
+- feat: support react and html of indicator
+
+
+- feat: support timeline component
+- fix: fix issue with indicator autolimit
+
+## 0.19.21
+Mon, 05 Aug 2024 01:39:45 GMT
+
+### Updates
+
+- feat: label line support custom path. feat @VisActor/VChart#3000
+
+## 0.19.20
+Wed, 31 Jul 2024 09:48:37 GMT
+
+_Version update only_
+
+## 0.19.19
+Tue, 23 Jul 2024 11:56:39 GMT
+
+### Updates
+
+- feat: marker label support custom shape. close @Visactor/VChart#2959
+- fix: in vertical layout, if only one line can be displayed, the layout will be directly based on the width of the legend item itself
+- fix: markpoint target size compute error. fix@Visactor/VChart#2766
+
+## 0.19.18
+Fri, 12 Jul 2024 07:18:10 GMT
+
+_Version update only_
+
+## 0.19.17
+Fri, 05 Jul 2024 17:26:17 GMT
+
+_Version update only_
+
+## 0.19.16
+Fri, 05 Jul 2024 14:29:15 GMT
+
+### Updates
+
+- fix: fix the issue where the arc label is still truncated despite setting `ellipsis: false`
+- fix: fix syncState of label when re-render stage
+
+
+
+## 0.19.15
+Fri, 28 Jun 2024 10:32:37 GMT
+
+_Version update only_
+
+## 0.19.14
+Wed, 26 Jun 2024 09:16:23 GMT
+
+### Updates
+
+- feat: upgrade @visactor/vutils
+
+## 0.19.13
+Tue, 25 Jun 2024 11:17:14 GMT
+
+_Version update only_
+
+## 0.19.12
+Fri, 21 Jun 2024 06:52:50 GMT
+
+_Version update only_
+
+## 0.19.11
+Fri, 14 Jun 2024 09:50:59 GMT
+
+### Updates
+
+- fix: fix position of canvas tooltip shape
+
+
+
+## 0.19.10
+Thu, 13 Jun 2024 09:52:46 GMT
+
+### Updates
+
+- feat: support `align` right of canvas tooltip
+
+
+
+## 0.19.9
+Wed, 05 Jun 2024 12:25:00 GMT
+
+### Updates
+
+- fix: colorLegend handler cannot customize fill color
+
+## 0.19.8
+Wed, 05 Jun 2024 08:24:28 GMT
+
+_Version update only_
+
+## 0.19.7
+Tue, 04 Jun 2024 11:10:08 GMT
+
+### Updates
+
+- fix: fix useless re-render of datazoom and brush
+
+
+
+## 0.19.6
+Wed, 29 May 2024 06:57:11 GMT
+
+### Updates
+
+- feat: add empty-tip component
+
+
+- fix(marker): fix marker position and ref bad case. fix@visactor/vchart#2721
+- fix: fix animation of state change
+
+
+
+## 0.19.5
+Fri, 24 May 2024 09:21:23 GMT
+
+### Updates
+
+- feat: add \`containerTextAlign\` for tag component
+
+## 0.19.4
+Fri, 17 May 2024 06:46:41 GMT
+
+### Updates
+
+- feat: add  scrollbar propagation spec to allow close stop propagation
+- feat: support harmony env
+- feat(marker): mark point support arc and target item. close@VisActor/VChart#2590
+- feat(player): index can be looped when set backward or forward button in player if user config loop. close@Vi
+- fix: fix error of arc label
+
+
+- fix: fix error of tooltip when rich text is empty
+
+
+- fix(legend): active item error when rerender legend. fix@VisActor/VChart#2690
+
+## 0.19.3
+Fri, 10 May 2024 09:24:38 GMT
+
+_Version update only_
+
+## 0.19.2
+Thu, 09 May 2024 12:26:00 GMT
+
+### Updates
+
+- feat: support `focus` mode in discrete legend
+
+
+
+## 0.19.1
+Wed, 08 May 2024 08:47:35 GMT
+
+_Version update only_
 
 ## 0.19.0
 Tue, 30 Apr 2024 08:40:53 GMT

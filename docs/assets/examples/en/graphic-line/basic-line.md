@@ -4,10 +4,17 @@ group: graphic-line
 title: basic-line
 keywords: line
 order: 1-0
-cover: http://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/line-basic.png
+cover: https://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/line-basic.png
 ---
 
 # line graphic
+
+The `Line` primitive is a basic graphical element used to represent the trend of data changes, commonly used in line charts and other types of charts. It forms a line by connecting data points, visually displaying the changes in data over time or other variables.
+
+Key features:
+- Data Points: The Line primitive represents numerical values through a series of coordinate points, typically plotted in a two-dimensional coordinate system.
+- Line Segments: Data points are connected by straight lines or curves to form a continuous line, making it easy to observe the trend of data changes.
+- Visual Effects: The color, thickness, and style of the line can be adjusted as needed to highlight different data series or degrees of change.
 
 ## code demo
 

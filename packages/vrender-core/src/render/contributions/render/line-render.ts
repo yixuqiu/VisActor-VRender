@@ -17,9 +17,7 @@ import type {
 } from '../../../interface';
 import { getTheme } from '../../../graphic/theme';
 import { LINE_NUMBER_TYPE } from '../../../graphic/constants';
-import { drawPathProxy, fillVisible, runFill, runStroke, strokeVisible } from './utils';
 import { BaseRender } from './base-render';
-import { mat4Allocate } from '../../../allocator/matrix-allocate';
 import { drawSegments } from '../../../common/render-curve';
 import { calcLineCache } from '../../../common/segment';
 
@@ -123,61 +121,6 @@ export class DefaultCanvasLineRender extends BaseRender<ILine> implements IGraph
         context.stroke();
       }
     }
-
-    // 绘制connect区域
-    let { connectedType, connectedX, connectedY, connectedStyle } = attribute;
-    if (isArray(defaultAttribute)) {
-      connectedType = connectedType ?? defaultAttribute[0].connectedType ?? defaultAttribute[1].connectedType;
-      connectedX = connectedX ?? defaultAttribute[0].connectedX ?? defaultAttribute[1].connectedX;
-      connectedY = connectedY ?? defaultAttribute[0].connectedY ?? defaultAttribute[1].connectedY;
-      connectedStyle = connectedStyle ?? defaultAttribute[0].connectedStyle ?? defaultAttribute[1].connectedStyle;
-    } else {
-      connectedType = connectedType ?? defaultAttribute.connectedType;
-      connectedX = connectedX ?? defaultAttribute.connectedX;
-      connectedY = connectedY ?? defaultAttribute.connectedY;
-      connectedStyle = connectedStyle ?? defaultAttribute.connectedStyle;
-    }
-    // 如果有非法值就是none
-    if (connectedType !== 'connect' && connectedType !== 'zero') {
-      connectedType = 'none';
-    }
-    if (connectedType !== 'none') {
-      context.beginPath();
-      drawSegments(context.camera ? context : context.nativeContext, cache, clipRange, clipRangeByDimension, {
-        offsetX,
-        offsetY,
-        offsetZ: z,
-        drawConnect: true,
-        mode: connectedType,
-        zeroX: connectedX,
-        zeroY: connectedY
-      });
-
-      const da = [];
-      if (isArray(defaultAttribute)) {
-        defaultAttribute.forEach(i => da.push(i));
-      } else {
-        da.push(defaultAttribute);
-      }
-      da.push(attribute);
-
-      if (fill !== false) {
-        if (fillCb) {
-          fillCb(context, attribute, defaultAttribute);
-        } else if (fillOpacity) {
-          context.setCommonStyle(line, connectedStyle, originX - offsetX, originY - offsetY, da);
-          context.fill();
-        }
-      }
-      if (stroke !== false) {
-        if (strokeCb) {
-          strokeCb(context, attribute, defaultAttribute);
-        } else if (strokeOpacity) {
-          context.setStrokeStyle(line, connectedStyle, originX - offsetX, originY - offsetY, da);
-          context.stroke();
-        }
-      }
-    }
     return !!ret;
   }
 
@@ -267,7 +210,9 @@ export class DefaultCanvasLineRender extends BaseRender<ILine> implements IGraph
       strokeOpacity = lineAttribute.strokeOpacity,
       segments,
       points,
-      closePath
+      closePath,
+      curveTension = lineAttribute.curveTension,
+      connectedType = lineAttribute.connectedType
     } = line.attribute;
 
     const data = this.valid(line, lineAttribute, fillCb, strokeCb);
@@ -301,6 +246,13 @@ export class DefaultCanvasLineRender extends BaseRender<ILine> implements IGraph
       );
     }
     // const { fVisible, sVisible, doFill, doStroke } = data;
+
+    function parsePoint(points: IPointLike[], connectedType: 'none' | 'connect') {
+      if (connectedType === 'none') {
+        return points;
+      }
+      return points.filter(p => p.defined !== false);
+    }
 
     // 更新cache
     if (line.shouldUpdateShape()) {
@@ -336,8 +288,9 @@ export class DefaultCanvasLineRender extends BaseRender<ILine> implements IGraph
               startPoint.y = lastSeg.endY;
               startPoint.defined = lastSeg.curves[lastSeg.curves.length - 1].defined;
             }
-            const data = calcLineCache(seg.points, curveType, {
-              startPoint
+            const data = calcLineCache(parsePoint(seg.points, connectedType), curveType, {
+              startPoint,
+              curveTension
             });
             lastSeg = data;
             return data;
@@ -362,7 +315,7 @@ export class DefaultCanvasLineRender extends BaseRender<ILine> implements IGraph
           line.cache[line.cache.length - 1] && line.cache[line.cache.length - 1].lineTo(startP.x, startP.y, true);
         }
       } else if (points && points.length) {
-        line.cache = calcLineCache(_points, curveType);
+        line.cache = calcLineCache(parsePoint(_points, connectedType), curveType, { curveTension });
       } else {
         line.cache = null;
         line.clearUpdateShapeTag();

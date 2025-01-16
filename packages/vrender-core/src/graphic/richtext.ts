@@ -1,4 +1,5 @@
-import { isNumber, type AABBBounds, type OBBBounds } from '@visactor/vutils';
+import type { IAABBBounds } from '@visactor/vutils';
+import { isNumber } from '@visactor/vutils';
 import type {
   IRichText,
   IRichTextCharacter,
@@ -23,7 +24,6 @@ import { getTheme } from './theme';
 import { RichTextIcon } from './richtext/icon';
 import type { FederatedMouseEvent } from '../event';
 import { application } from '../application';
-import { parsePadding } from '../common/utils';
 import { RICHTEXT_NUMBER_TYPE } from './constants';
 
 const RICHTEXT_UPDATE_TAG_KEY = [
@@ -38,6 +38,16 @@ const RICHTEXT_UPDATE_TAG_KEY = [
   'textBaseline',
   'textConfig',
   'layoutDirection',
+  'fill',
+  'stroke',
+  'fontSize',
+  'fontFamily',
+  'fontStyle',
+  'fontWeight',
+  'lineWidth',
+  'opacity',
+  'fillOpacity',
+  'strokeOpacity',
   ...GRAPHIC_UPDATE_TAG_KEY
 ];
 
@@ -61,6 +71,18 @@ export class RichText extends Graphic<IRichTextGraphicAttribute> implements IRic
   constructor(params?: IRichTextGraphicAttribute) {
     super(params);
     this.numberType = RICHTEXT_NUMBER_TYPE;
+
+    this.onBeforeAttributeUpdate = ((val: any, attributes: any, key: null | string | string[]) => {
+      for (const key in val) {
+        if (key === 'hoverIconId') {
+          if (val[key] === attributes[key]) {
+            continue;
+          }
+          const icon = this._frameCache.icons.get(val[key]);
+          this.updateHoverIconState(icon);
+        }
+      }
+    }) as any;
   }
 
   get width(): number {
@@ -161,33 +183,78 @@ export class RichText extends Graphic<IRichTextGraphicAttribute> implements IRic
     this.addUpdateShapeAndBoundsTag();
   }
 
-  protected doUpdateAABBBounds(): AABBBounds {
-    const richTextTheme = getTheme(this).richtext;
-    this._AABBBounds.clear();
-    const attribute = this.attribute;
-    const bounds = application.graphicService.updateRichTextAABBBounds(
-      attribute,
-      getTheme(this).richtext,
-      this._AABBBounds,
-      this
-    ) as AABBBounds;
+  getGraphicTheme(): Required<IRichTextGraphicAttribute> {
+    return getTheme(this).richtext;
+  }
 
-    const { boundsPadding = richTextTheme.boundsPadding } = attribute;
-    const paddingArray = parsePadding(boundsPadding);
-    if (paddingArray) {
-      bounds.expand(paddingArray);
+  protected updateAABBBounds(
+    attribute: IRichTextGraphicAttribute,
+    richtextTheme: Required<IRichTextGraphicAttribute>,
+    aabbBounds: IAABBBounds
+  ) {
+    const {
+      width = richtextTheme.width,
+      height = richtextTheme.height,
+      maxWidth = richtextTheme.maxWidth,
+      maxHeight = richtextTheme.maxHeight,
+      textAlign = richtextTheme.textAlign,
+      textBaseline = richtextTheme.textBaseline
+    } = attribute;
+
+    if (width > 0 && height > 0) {
+      // 外部设置宽高
+      aabbBounds.set(0, 0, width, height);
+    } else {
+      // 获取内容宽高
+      const frameCache = this.getFrameCache();
+      const { width: actualWidth, height: actualHeight } = frameCache.getActualSize();
+      let contentWidth = width || actualWidth || 0;
+      let contentHeight = height || actualHeight || 0;
+
+      contentHeight = typeof maxHeight === 'number' && contentHeight > maxHeight ? maxHeight : contentHeight || 0;
+      contentWidth = typeof maxWidth === 'number' && contentWidth > maxWidth ? maxWidth : contentWidth || 0;
+
+      aabbBounds.set(0, 0, contentWidth, contentHeight);
     }
 
-    this.clearUpdateBoundTag();
-    return bounds;
-  }
+    // 调整对齐方式
+    let deltaY = 0;
+    switch (textBaseline) {
+      case 'top':
+        deltaY = 0;
+        break;
+      case 'middle':
+        deltaY = -aabbBounds.height() / 2;
+        break;
+      case 'bottom':
+        deltaY = -aabbBounds.height();
+        break;
+      default:
+        break;
+    }
+    let deltaX = 0;
+    switch (textAlign) {
+      case 'left':
+        deltaX = 0;
+        break;
+      case 'center':
+        deltaX = -aabbBounds.width() / 2;
+        break;
+      case 'right':
+        deltaX = -aabbBounds.width();
+        break;
+      default:
+        break;
+    }
+    aabbBounds.translate(deltaX, deltaY);
 
-  protected tryUpdateOBBBounds(): OBBBounds {
-    throw new Error('暂不支持');
-  }
+    application.graphicService.updateTempAABBBounds(aabbBounds);
 
-  getDefaultAttribute(name: string) {
-    return DefaultRichTextAttribute[name];
+    if (attribute.forceBoundsHeight != null || attribute.forceBoundsWidth != null) {
+      application.graphicService.updateHTMLTextAABBBounds(attribute, richtextTheme, aabbBounds);
+    }
+    application.graphicService.transformAABBBounds(attribute, aabbBounds, richtextTheme, false, this);
+    return aabbBounds;
   }
 
   protected needUpdateTags(keys: string[]): boolean {
@@ -202,6 +269,27 @@ export class RichText extends Graphic<IRichTextGraphicAttribute> implements IRic
       this.clearUpdateShapeTag();
     }
     return this._frameCache;
+  }
+
+  get cliped() {
+    const frameCache = this.getFrameCache();
+    if (frameCache.actualHeight > frameCache.height) {
+      return true;
+    }
+    const { disableAutoWrapLine } = this.attribute;
+    if (disableAutoWrapLine) {
+      for (let i = 0; i < frameCache.lines.length; i++) {
+        const l = frameCache.lines[i];
+        for (let j = 0; j < l.paragraphs.length; j++) {
+          const p = l.paragraphs[j];
+          if ((p as any).overflow && (p as any).text !== '') {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+    // if (height < this.attribute.height || )
   }
   combinedStyleToCharacter(config: IRichTextImageCharacter | IRichTextParagraphCharacter) {
     const {
@@ -230,10 +318,10 @@ export class RichText extends Graphic<IRichTextGraphicAttribute> implements IRic
       ...config
     };
   }
-  doUpdateFrameCache() {
+  doUpdateFrameCache(tc?: IRichTextCharacter[]) {
     // 1. 测量，生成paragraph
     const {
-      textConfig = [],
+      textConfig: _tc = [],
       maxWidth,
       maxHeight,
       width,
@@ -245,15 +333,18 @@ export class RichText extends Graphic<IRichTextGraphicAttribute> implements IRic
       textBaseline,
       layoutDirection,
       singleLine,
-      forceBreakLine
+      disableAutoWrapLine
     } = this.attribute;
     const paragraphs: (Paragraph | RichTextIcon)[] = [];
+
+    const textConfig = tc ?? _tc;
 
     for (let i = 0; i < textConfig.length; i++) {
       if ('image' in textConfig[i]) {
         const config = this.combinedStyleToCharacter(
           textConfig[i] as IRichTextImageCharacter
         ) as IRichTextImageCharacter;
+        (config as any).lineWidth = undefined; // for icon bounds
         // 直接创建icon Mark
         const iconCache =
           config.id && this._frameCache && this._frameCache.icons && this._frameCache.icons.get(config.id);
@@ -337,8 +428,7 @@ export class RichText extends Graphic<IRichTextGraphicAttribute> implements IRic
       this._frameCache?.icons
     );
     const wrapper = new Wrapper(frame);
-    // debugger;
-    if (forceBreakLine) {
+    if (disableAutoWrapLine) {
       let lineCount = 0;
       let skip = false;
       for (let i = 0; i < paragraphs.length; i++) {
@@ -349,7 +439,7 @@ export class RichText extends Graphic<IRichTextGraphicAttribute> implements IRic
           (p as Paragraph).top = Infinity;
           !(p as Paragraph).newLine && frame.lines[frame.lines.length - 1].paragraphs.push(p);
         } else {
-          wrapper.deal(p);
+          wrapper.deal(p, true);
         }
         if (frame.lines.length !== lineCount) {
           lineCount = frame.lines.length;
@@ -362,7 +452,9 @@ export class RichText extends Graphic<IRichTextGraphicAttribute> implements IRic
         }
         if ((p as Paragraph).newLine) {
           skip = false;
+          wrapper.lineWidth = 0;
         }
+        wrapper.send();
       }
     } else {
       for (let i = 0; i < paragraphs.length; i++) {
@@ -422,29 +514,48 @@ export class RichText extends Graphic<IRichTextGraphicAttribute> implements IRic
       if (pickedIcon && pickedIcon === this._currentHoverIcon) {
         // do nothing
       } else if (pickedIcon) {
-        this._currentHoverIcon?.setHoverState(false);
-        this._currentHoverIcon = pickedIcon;
-        this._currentHoverIcon.setHoverState(true);
-        this.stage?.setCursor(pickedIcon.attribute.cursor);
-        this.stage?.renderNextFrame();
-      } else if (!pickedIcon && this._currentHoverIcon) {
-        this._currentHoverIcon.setHoverState(false);
-        this._currentHoverIcon = null;
-        this.stage?.setCursor();
-        // console.log('setCursor()');
+        this.setAttribute('hoverIconId', pickedIcon.richtextId);
 
-        this.stage?.renderNextFrame();
+        // this._currentHoverIcon?.setHoverState(false);
+        // this._currentHoverIcon = pickedIcon;
+        // this._currentHoverIcon.setHoverState(true);
+        // this.stage?.setCursor(pickedIcon.attribute.cursor);
+        // this.stage?.renderNextFrame();
+      } else if (!pickedIcon && this._currentHoverIcon) {
+        this.setAttribute('hoverIconId', undefined);
+
+        // this._currentHoverIcon.setHoverState(false);
+        // this._currentHoverIcon = null;
+        // this.stage?.setCursor();
+        // this.stage?.renderNextFrame();
       }
     });
 
     this.addEventListener('pointerleave', (e: FederatedMouseEvent) => {
       if (this._currentHoverIcon) {
-        this._currentHoverIcon.setHoverState(false);
-        this._currentHoverIcon = null;
-        this.stage?.setCursor();
-        this.stage?.renderNextFrame();
+        this.setAttribute('hoverIconId', undefined);
+
+        // this._currentHoverIcon.setHoverState(false);
+        // this._currentHoverIcon = null;
+        // this.stage?.setCursor();
+        // this.stage?.renderNextFrame();
       }
     });
+  }
+
+  updateHoverIconState(pickedIcon?: IRichTextIcon) {
+    if (pickedIcon) {
+      this._currentHoverIcon?.setHoverState(false);
+      this._currentHoverIcon = pickedIcon;
+      this._currentHoverIcon.setHoverState(true);
+      this.stage?.setCursor(pickedIcon.attribute.cursor);
+      this.stage?.renderNextFrame();
+    } else {
+      this._currentHoverIcon.setHoverState(false);
+      this._currentHoverIcon = null;
+      this.stage?.setCursor();
+      this.stage?.renderNextFrame();
+    }
   }
 
   pickIcon(point: EventPoint): IRichTextIcon | undefined {
@@ -457,12 +568,14 @@ export class RichText extends Graphic<IRichTextGraphicAttribute> implements IRic
     //   }
     // }
     let pickIcon: IRichTextIcon | undefined;
-    frameCache.icons.forEach(icon => {
-      if (icon.AABBBounds.containsPoint({ x: point.x - x, y: point.y - y })) {
+    frameCache.icons.forEach((icon, key) => {
+      const bounds = icon.AABBBounds.clone();
+      bounds.translate(icon._marginArray[3], icon._marginArray[0]);
+      if (bounds.containsPoint({ x: point.x - x, y: point.y - y })) {
         pickIcon = icon;
 
-        pickIcon.globalX = (pickIcon.attribute.x ?? 0) + x;
-        pickIcon.globalY = (pickIcon.attribute.y ?? 0) + y;
+        pickIcon.globalX = (pickIcon.attribute.x ?? 0) + x + icon._marginArray[3];
+        pickIcon.globalY = (pickIcon.attribute.y ?? 0) + y + icon._marginArray[0];
       }
     });
 

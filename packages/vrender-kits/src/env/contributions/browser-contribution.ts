@@ -1,4 +1,4 @@
-import { injectable, Generator, BaseEnvContribution } from '@visactor/vrender-core';
+import { injectable, Generator, BaseEnvContribution, application } from '@visactor/vrender-core';
 import type {
   ICanvasLike,
   EnvType,
@@ -38,7 +38,9 @@ class DynamicB {
 
 export function createImageElement(src: string, isSvg: boolean = false): Promise<HTMLImageElement> {
   const img = document.createElement('img');
-  img.crossOrigin = 'anonymous';
+  if (application.global.isImageAnonymous) {
+    img.crossOrigin = 'anonymous';
+  }
   if (isSvg) {
     const data = new Blob([src], { type: 'image/svg+xml' });
     src = window.URL.createObjectURL(data);
@@ -349,5 +351,27 @@ export class BrowserEnvContribution extends BaseEnvContribution implements IEnvC
       top: actualTop,
       left: actualLeft
     };
+  }
+
+  async loadFont(
+    font: string,
+    source: string | BinaryData,
+    descriptors?: FontFaceDescriptors
+  ): Promise<{ loadState: 'success' | 'fail' }> {
+    // 创建字体实例
+    const myFont = new FontFace(font, isString(source) ? `url(${source})` : source, descriptors);
+
+    // 加载字体
+    return myFont
+      .load()
+      .then(function (loadedFont) {
+        // 将字体添加到文档中
+        (document.fonts as any).add(loadedFont);
+        return { loadState: 'success' } as { loadState: 'success' | 'fail' };
+      })
+      .catch(function (error) {
+        console.error('Failed to load font:', error);
+        return { loadState: 'fail' } as { loadState: 'success' | 'fail' };
+      });
   }
 }

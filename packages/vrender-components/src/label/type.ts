@@ -10,7 +10,10 @@ import type {
   ILineGraphicAttribute,
   IRichTextCharacter,
   IRichText,
-  ILine
+  ILine,
+  ICustomPath2D,
+  IArc,
+  IGroup
 } from '@visactor/vrender-core';
 import type { BoundsAnchorType, IPointLike, InsideBoundsAnchorType } from '@visactor/vutils';
 
@@ -101,11 +104,22 @@ export interface BaseLabelAttrs extends IGroupGraphicAttribute {
 
   /** 动画配置 */
   animation?: ILabelAnimation | boolean;
-  animationEnter?: ILabelUpdateAnimation;
-  animationUpdate?: ILabelUpdateAnimation | ILabelUpdateChannelAnimation[];
-  animationExit?: ILabelExitAnimation;
+  /**
+   * 新增标签动画
+   */
+  animationEnter?: ILabelUpdateAnimation | boolean;
+  /**
+   * 标签更新动画
+   */
+  animationUpdate?: ILabelUpdateAnimation | ILabelUpdateChannelAnimation[] | boolean;
+  /**
+   * 标签被删除的动画配置
+   */
+  animationExit?: ILabelExitAnimation | boolean;
 
-  // 排序 or 删减
+  /**
+   * 数据过滤自定义函数，可以用于 排序 or 删减
+   */
   dataFilter?: (data: LabelItem[]) => LabelItem[];
 
   /** 自定义布局函数
@@ -127,6 +141,15 @@ export interface BaseLabelAttrs extends IGroupGraphicAttribute {
     getRelatedPoint?: (data: LabelItem) => IPointLike
   ) => (IText | IRichText)[];
   /**
+   * 防重叠计算完成后的回调函数
+   * @since 1.19.16
+   */
+  onAfterOverlapping?: (
+    labels: (IText | IRichText)[],
+    getRelatedGraphic: (data: LabelItem) => IGraphic,
+    getRelatedPoint?: (data: LabelItem) => IPointLike
+  ) => void;
+  /**
    * 关闭交互效果
    * @default false
    */
@@ -139,7 +162,16 @@ export interface OverlapAttrs {
   /**
    * 防重叠的区域大小
    */
-  size?: { width: number; height: number };
+  size?: {
+    /**
+     * 防重叠区域的宽度
+     */
+    width: number;
+    /**
+     * 防重叠区域的高度
+     */
+    height: number;
+  };
 
   /**
    * 发生重叠后，是否隐藏标签
@@ -167,14 +199,23 @@ export interface OverlapAttrs {
 
   /**
    * 发生重叠后的躲避策略
+   * @since 0.20.10 支持全局 Y 方向偏移策略 'shiftY'。当标签发生重叠时，会保相对位置并在 Y 方向上散开。由于 'shiftY' 是全局布局策略，不与其他策略同时生效。
    */
-  strategy?: Strategy[];
+  strategy?: Strategy[] | ShiftYStrategy;
 
   /**
    * 文字在防重叠计算中预留的边距。
    * @default 0
    */
   overlapPadding?: number;
+
+  /**
+   * 防重叠的顺序权重
+   * @since 0.20.10
+   * @param labelItem
+   * @returns number 数值越大，权重越高。权重越高的标签越优先被布局。
+   */
+  priority?: (labelItem: LabelItem) => number;
 }
 
 export interface SmartInvertAttrs {
@@ -231,29 +272,79 @@ export interface SmartInvertAttrs {
    * label超出mark范围，也以mark作为背景色进行反色
    */
   outsideEnable?: boolean;
+  /**
+   * 当标签和mark相交，但是没有完全在mark内部的时候，支持三种处理方式：
+   *
+   * * none：不做任何处理
+   * * stroked：标签存在描边的时候，根据描边进行处理
+   * * inside: 和标签完全在mark内部一样处理
+   */
+  interactInvertType?: 'none' | 'stroked' | 'inside';
 }
+
+export type ShiftYStrategy = {
+  /**
+   * 将防重叠策略设置为 'shiftY'
+   */
+  type: 'shiftY';
+  /**
+   * 布局迭代次数
+   * @default 10
+   */
+  iteration?: number;
+  /**
+   * 布局容差
+   * @default 0.1
+   */
+  maxError?: number;
+  /**
+   * 散开后的间距
+   * @default 1
+   */
+  padding?: number;
+};
 
 export type PositionStrategy = {
   /**
-   * 可选位置策略。
+   * 将防重叠的策略设置为'position'，即可选位置策略。
    * 若默认位置没有足够的空间放置标签，则考虑 position 内的备选位置。
    */
   type: 'position';
+  /**
+   * 所有的备选位置
+   */
   position?: Functional<LabelPosition[]>;
+  /**
+   * 当 position 内的备选位置依然无法放下标签时，标签是否放回原位。
+   * 默认为 true，若为 false，则标签会被放在 position 数组的最后一个位置。
+   * @since 0.20.18
+   * @default true
+   */
+  restorePosition?: boolean;
 };
 
 export type BoundStrategy = {
   /**
-   * 标签配置在图形内部时使用。
+   * 将防重叠策略设置为'bound'，当标签配置在图形内部时使用。
    * 当图形大小不足以放下标签，则考虑 position 内的备选位置。
    */
   type: 'bound';
+  /**
+   * 所有的备选位置
+   */
   position?: Functional<LabelPosition[]>;
+  /**
+   * 当 position 内的备选位置依然无法放下标签时，标签是否放回原位。
+   * 默认为 true，若为 false，则标签会被放在 position 数组的最后一个位置。
+   * @since 0.20.18
+   * @default true
+   */
+  restorePosition?: boolean;
 };
 
 export type MoveYStrategy = {
   /**
-   * 可选位置策略。
+   * 将防重叠策略设置为'moveY'
    * 若默认位置没有足够的空间放置标签，则根据 offset 在Y方向上寻找位置。
    */
   type: 'moveY';
@@ -265,7 +356,7 @@ export type MoveYStrategy = {
 
 export type MoveXStrategy = {
   /**
-   * 可选位置策略。
+   * 将防重叠策略设置为'moveX'
    * 若默认位置没有足够的空间放置标签，则根据 offset 在X方向上寻找位置。
    */
   type: 'moveX';
@@ -322,8 +413,9 @@ export interface LineDataLabelAttrs extends BaseLabelAttrs {
   /**
    * 标签位置
    * @default 'top'
+   * @since 0.21.1 支持 'inside-middle' 在面积图元中显示在中间位置
    */
-  position?: Functional<BoundsAnchorType>;
+  position?: Functional<BoundsAnchorType | 'inside-middle'>;
 }
 
 export interface PolygonLabelAttrs extends BaseLabelAttrs {
@@ -346,8 +438,9 @@ export interface ArcLabelAttrs extends BaseLabelAttrs {
   /**
    * 标签位置
    * @default 'outside'
+   * @since 0.20.1 support 'inside-center'
    */
-  position?: Functional<'inside' | 'outside' | 'inside-inner' | 'inside-outer'>;
+  position?: 'inside' | 'outside' | 'inside-inner' | 'inside-outer' | 'inside-center';
 
   // 画布宽度
   width?: number;
@@ -412,6 +505,11 @@ export interface ILabelLineSpec {
    */
   visible?: boolean;
   /**
+   * 自定义路径
+   * @since 0.19.21
+   */
+  customShape?: (container: IGroup, attrs: Partial<ILineGraphicAttribute>, path: ICustomPath2D) => ICustomPath2D;
+  /**
    * 引导线样式
    */
   style?: Partial<ILineGraphicAttribute>;
@@ -426,8 +524,9 @@ export interface IArcLabelLineSpec extends ILabelLineSpec {
   /**
    * 引导线 line2 部分最小长度
    * @default 10
+   * @since 0.20.3 支持函数回调
    */
-  line2MinLength?: number;
+  line2MinLength?: number | ((texts: IGraphic[], arcs: IArc[], attrs: Partial<ArcLabelAttrs>) => number);
   /**
    * 引导线是否光滑
    * @default false
@@ -447,6 +546,11 @@ export interface IArcLabelLayoutSpec {
   textAlign?: ArcLabelAlignType;
   /** @deprecate 建议统一使用textAlign，后续将废除 */
   align?: ArcLabelAlignType;
+  /**
+   * 标签对齐的偏移量
+   * @since 0.20.3
+   */
+  alignOffset?: number | ((texts: IGraphic[], arcs: IArc[], attrs: Partial<ArcLabelAttrs>) => number);
   /**
    * 标签布局策略
    * @default 'priority'
@@ -469,26 +573,65 @@ export interface DataLabelAttrs extends IGroupGraphicAttribute {
 
 export type Functional<T> = T | ((data: any) => T);
 
+/**
+ * 标签的离场动画配置
+ */
 export interface ILabelExitAnimation {
+  /**
+   * 动画执行的时长
+   */
   duration?: number;
+  /**
+   * 动画延迟的时长
+   */
   delay?: number;
+  /**
+   * 动画的缓动函数
+   */
   easing?: EasingType;
 }
 
+/**
+ * 标签的入场动画配置
+ */
 export interface ILabelEnterAnimation extends ILabelExitAnimation {
+  /**
+   * 标签动画的模式，支持三种类型
+   * - same-time：标签出现动画和关联图形的动画同时进行
+   * - after：当关联动图的出场动画结束后，执行标签的出场动画
+   * - after-all：当所有关联图元的出场动画结束后，执行标签的出场动画
+   */
   mode?: 'same-time' | 'after' | 'after-all';
 }
 
+/**
+ * 标签的更新动画配置
+ */
 export interface ILabelUpdateAnimation extends ILabelExitAnimation {
-  /** 是否开启 increaseCount 动画
+  /**
+   * 是否开启 increaseCount 动画
    * @default true
    */
   increaseEffect?: boolean;
 }
 
+/**
+ * 标签更新的时候，动画的通道配置
+ */
 export interface ILabelUpdateChannelAnimation extends ILabelUpdateAnimation {
+  /**
+   * 进行插值动画的视觉通道
+   */
   channel?: string[];
-  options?: { excludeChannels?: string[] };
+  /**
+   * 动画的配置
+   */
+  options?: {
+    /**
+     * 忽略的视觉通道
+     */
+    excludeChannels?: string[];
+  };
 }
 
 export interface ILabelAnimation extends ILabelEnterAnimation, ILabelExitAnimation, ILabelUpdateAnimation {}

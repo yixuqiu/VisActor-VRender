@@ -1,7 +1,7 @@
 import { merge } from '@visactor/vutils';
 import { AbstractComponent } from '../core/base';
 import type { RadioAttributes } from './type';
-import { Arc, WrapText } from '@visactor/vrender-core';
+import { Arc, Text } from '@visactor/vrender-core';
 import type { ComponentOptions } from '../interface';
 import { loadRadioComponent } from './register';
 
@@ -39,7 +39,9 @@ export class Radio extends AbstractComponent<Required<RadioAttributes>> {
     }
   };
   _circle: Arc;
-  _text: WrapText;
+  _text: Text;
+
+  name: 'radio';
 
   constructor(attributes: RadioAttributes, options?: ComponentOptions) {
     super(options?.skipDefault ? attributes : merge({}, Radio.defaultAttributes, attributes));
@@ -79,12 +81,17 @@ export class Radio extends AbstractComponent<Required<RadioAttributes>> {
         fill: this.attribute.circle.checkedFill,
         stroke: this.attribute.circle.checkedStroke
       });
+    } else if (this.attribute.disabled) {
+      this._circle.setAttributes({
+        fill: this.attribute.circle.disableFill
+        // stroke: this.attribute.circle.disableFill
+      });
     }
     this.appendChild(this._circle);
   }
 
   renderText() {
-    this._text = new WrapText(merge({}, this.attribute.text));
+    this._text = new Text(merge({}, this.attribute.text));
     if (this.attribute.disabled) {
       this._text.setAttribute('fill', this.attribute.text.disableFill);
     }
@@ -136,4 +143,11 @@ export class Radio extends AbstractComponent<Required<RadioAttributes>> {
 
     this.stage.renderNextFrame();
   };
+
+  initAttributes(params: RadioAttributes, options?: ComponentOptions) {
+    params = options?.skipDefault ? params : merge({}, Radio.defaultAttributes, params);
+    super.initAttributes(params);
+    this.renderGroup();
+    this.render();
+  }
 }

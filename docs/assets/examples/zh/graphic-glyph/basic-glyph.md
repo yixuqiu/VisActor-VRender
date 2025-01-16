@@ -4,10 +4,12 @@ group: graphic-glyph
 title: basic-glyph
 keywords: glyph
 order: 1-0
-cover: http://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/glyph-basic.png
+cover: https://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/glyph-basic.png
 ---
 
 # glyph 图元
+
+`glyph`图元是指由多个基本图元（如线、圆、矩形等）组合而成的复杂图形元素。这种设计方法允许创建更丰富的视觉效果和功能性，广泛应用于图形设计、数据可视化和用户界面设计中。
 
 ## 代码演示
 

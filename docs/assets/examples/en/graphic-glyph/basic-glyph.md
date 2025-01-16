@@ -4,10 +4,11 @@ group: graphic-glyph
 title: basic-glyph
 keywords: glyph
 order: 1-0
-cover: http://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/glyph-basic.png
+cover: https://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/glyph-basic.png
 ---
 
 # glyph graphic
+The `glyph` primitive refers to complex graphic elements composed of multiple basic primitives (such as lines, circles, rectangles, etc.). This design approach allows for the creation of richer visual effects and functionality, widely used in graphic design, data visualization, and user interface design.
 
 ## code demo
 

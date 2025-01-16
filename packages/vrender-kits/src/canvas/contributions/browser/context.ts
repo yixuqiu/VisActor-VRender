@@ -24,7 +24,7 @@
   SOFTWARE.
  */
 import type { IPointLike, TextMeasure, ITextMeasureSpec, IMatrix } from '@visactor/vutils';
-import { Matrix, pi, pi2, Logger } from '@visactor/vutils';
+import { Matrix, pi, pi2, Logger, getContextFont } from '@visactor/vutils';
 import {
   injectable,
   DefaultFillStyle,
@@ -35,7 +35,6 @@ import {
   application,
   matrixAllocate,
   transformMat4,
-  getContextFont,
   createConicalGradient
 } from '@visactor/vrender-core';
 import type {
@@ -108,6 +107,7 @@ const addArcToBezierPath = (
 @injectable()
 export class BrowserContext2d implements IContext2d {
   static env: EnvType = 'browser';
+  baseGlobalAlpha: number;
   drawPromise?: Promise<any>;
   declare mathTextMeasure: TextMeasure<ITextMeasureSpec>;
 
@@ -139,7 +139,7 @@ export class BrowserContext2d implements IContext2d {
     return this.nativeContext.font;
   }
   set globalAlpha(d: number) {
-    this.nativeContext.globalAlpha = d;
+    this.nativeContext.globalAlpha = d * this.baseGlobalAlpha;
   }
   get globalAlpha(): number {
     return this.nativeContext.globalAlpha;
@@ -248,6 +248,7 @@ export class BrowserContext2d implements IContext2d {
     this.dpr = dpr;
     this.applyedMatrix = new Matrix(1, 0, 0, 1, 0, 0);
     this._clearMatrix = new Matrix(1, 0, 0, 1, 0, 0);
+    this.baseGlobalAlpha = 1;
   }
 
   reset() {
@@ -538,7 +539,7 @@ export class BrowserContext2d implements IContext2d {
         this.bezierCurveTo(bez[0], bez[1], bez[2], bez[3], bez[4], bez[5], z);
       }
     } else {
-      this.nativeContext.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+      this.nativeContext.arc(x, y, Math.max(0, radius), startAngle, endAngle, anticlockwise);
     }
   }
 
@@ -683,6 +684,13 @@ export class BrowserContext2d implements IContext2d {
   }
 
   createLinearGradient(x0: number, y0: number, x1: number, y1: number) {
+    if (!isFinite(x0 + y0 + x1 + y1)) {
+      x0 = 0;
+      y0 = 0;
+      x1 = 0;
+      y1 = 0;
+    }
+
     return this.nativeContext.createLinearGradient(x0, y0, x1, y1);
   }
 
@@ -993,12 +1001,11 @@ export class BrowserContext2d implements IContext2d {
       opacity = defaultParams.opacity,
       fill = defaultParams.fill
     } = attribute;
+    _context.globalAlpha = fillOpacity * opacity * this.baseGlobalAlpha;
+
     if (fillOpacity > 1e-12 && opacity > 1e-12) {
-      _context.globalAlpha = fillOpacity * opacity;
       _context.fillStyle = createColor(this, fill, params, offsetX, offsetY);
       // todo 小程序
-    } else {
-      _context.globalAlpha = fillOpacity * opacity;
     }
   }
 
@@ -1119,6 +1126,9 @@ export class BrowserContext2d implements IContext2d {
       defaultParams = this.strokeAttributes;
     }
     const { strokeOpacity = defaultParams.strokeOpacity, opacity = defaultParams.opacity } = attribute;
+
+    _context.globalAlpha = strokeOpacity * opacity * this.baseGlobalAlpha;
+
     if (strokeOpacity > 1e-12 && opacity > 1e-12) {
       const {
         lineWidth = defaultParams.lineWidth,
@@ -1126,10 +1136,10 @@ export class BrowserContext2d implements IContext2d {
         lineJoin = defaultParams.lineJoin,
         lineDash = defaultParams.lineDash,
         lineCap = defaultParams.lineCap,
-        miterLimit = defaultParams.miterLimit
+        miterLimit = defaultParams.miterLimit,
+        keepStrokeScale = defaultParams.keepStrokeScale
       } = attribute;
-      _context.globalAlpha = strokeOpacity * opacity;
-      _context.lineWidth = getScaledStroke(this, lineWidth, this.dpr);
+      _context.lineWidth = keepStrokeScale ? lineWidth : getScaledStroke(this, lineWidth, this.dpr);
       _context.strokeStyle = createColor(this, stroke as any, params, offsetX, offsetY);
       _context.lineJoin = lineJoin;
       lineDash && _context.setLineDash(lineDash);

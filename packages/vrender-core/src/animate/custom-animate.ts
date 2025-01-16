@@ -1,5 +1,15 @@
 import type { IPoint, IPointLike } from '@visactor/vutils';
-import { getDecimalPlaces, isArray, isNumber, pi, pi2, Point, PointService } from '@visactor/vutils';
+import {
+  clamp,
+  getDecimalPlaces,
+  isArray,
+  isNumber,
+  isValidNumber,
+  pi,
+  pi2,
+  Point,
+  PointService
+} from '@visactor/vutils';
 import { application } from '../application';
 import { AttributeUpdateType } from '../common/enums';
 import { CustomPath2D } from '../common/custom-path2d';
@@ -19,13 +29,13 @@ import type {
   IRect,
   IRectAttribute,
   IRectGraphicAttribute,
+  ISegment,
   IShadowRoot
 } from '../interface';
 import { ACustomAnimate } from './animate';
 import { Easing } from './easing';
 import { pointInterpolation } from '../common/utils';
 import { divideCubic } from '../common/segment/curve/cubic-bezier';
-import { LineCurve } from '../common/segment/curve/line';
 
 export class IncreaseCount extends ACustomAnimate<{ text: string | number }> {
   declare valid: boolean;
@@ -77,7 +87,7 @@ export class IncreaseCount extends ACustomAnimate<{ text: string | number }> {
       return;
     }
     if (end) {
-      out.text = this.toNumber;
+      out.text = this.to?.text;
     } else {
       out.text = (this.fromNumber + (this.toNumber - this.fromNumber) * ratio).toFixed(this.decimalLength);
     }
@@ -302,7 +312,7 @@ export class StreamLight extends ACustomAnimate<any> {
     to: any,
     duration: number,
     easing: EasingType,
-    params?: { attribute?: Partial<IRectAttribute | ILineAttribute>; streamLength?: number }
+    params?: { attribute?: Partial<IRectAttribute | ILineAttribute>; streamLength?: number; isHorizontal?: boolean }
   ) {
     super(from, to, duration, easing, params);
   }
@@ -337,17 +347,21 @@ export class StreamLight extends ACustomAnimate<any> {
   onStartRect(): void {
     const root = this.target.attachShadow();
 
-    const height = this.target.AABBBounds.height();
+    const isHorizontal = this.params?.isHorizontal ?? true;
+    const sizeAttr = isHorizontal ? 'height' : 'width';
+    const otherSizeAttr = isHorizontal ? 'width' : 'height';
+    const size = this.target.AABBBounds[sizeAttr]();
+    const y = isHorizontal ? 0 : this.target.AABBBounds.y1;
 
     const rect = application.graphicService.creator.rect({
-      height: height,
+      [sizeAttr]: size,
       fill: '#bcdeff',
       shadowBlur: 30,
       shadowColor: '#bcdeff',
       ...this.params?.attribute,
       x: 0,
-      y: 0,
-      width: 0
+      y,
+      [otherSizeAttr]: 0
     });
     this.rect = rect;
     root.add(rect);
@@ -370,28 +384,75 @@ export class StreamLight extends ACustomAnimate<any> {
   }
 
   protected onUpdateRect(end: boolean, ratio: number, out: Record<string, any>): void {
-    const parentWidth = (this.target as any).attribute.width ?? 250;
-    const streamLength = this.params?.streamLength ?? parentWidth;
-    const maxLength = this.params?.attribute?.width ?? 60;
-    const startX = -maxLength;
-    const currentX = startX + (streamLength - startX) * ratio;
-    const x = Math.max(currentX, 0);
-    const w = Math.min(Math.min(currentX + maxLength, maxLength), streamLength - currentX);
-    const width = w + x > parentWidth ? Math.max(parentWidth - x, 0) : w;
-    this.rect.setAttributes(
-      {
-        x,
-        width
-      } as any,
-      false,
-      {
-        type: AttributeUpdateType.ANIMATE_PLAY,
-        animationState: {
-          ratio,
-          end
+    const isHorizontal = this.params?.isHorizontal ?? true;
+    const parentAttr = (this.target as any).attribute;
+    if (isHorizontal) {
+      const parentWidth = parentAttr.width ?? Math.abs(parentAttr.x1 - parentAttr.x) ?? 250;
+      const streamLength = this.params?.streamLength ?? parentWidth;
+      const maxLength = this.params?.attribute?.width ?? 60;
+      // 起点，rect x右端点 对齐 parent左端点
+      // 如果parent.x1 < parent.x, 需要把rect属性移到parent x1的位置上, 因为初始 rect.x = parent.x
+      const startX = -maxLength;
+      // 插值
+      const currentX = startX + (streamLength - startX) * ratio;
+      // 位置限定 > 0
+      const x = Math.max(currentX, 0);
+      // 宽度计算
+      const w = Math.min(Math.min(currentX + maxLength, maxLength), streamLength - currentX);
+      // 如果 rect右端点 超出 parent右端点, 宽度动态调整
+      const width = w + x > parentWidth ? Math.max(parentWidth - x, 0) : w;
+      this.rect.setAttributes(
+        {
+          x,
+          width,
+          dx: Math.min(parentAttr.x1 - parentAttr.x, 0)
+        } as any,
+        false,
+        {
+          type: AttributeUpdateType.ANIMATE_PLAY,
+          animationState: {
+            ratio,
+            end
+          }
         }
+      );
+    } else {
+      const parentHeight = parentAttr.height ?? Math.abs(parentAttr.y1 - parentAttr.y) ?? 250;
+      const streamLength = this.params?.streamLength ?? parentHeight;
+      const maxLength = this.params?.attribute?.height ?? 60;
+      // 起点，y上端点 对齐 parent下端点
+      const startY = parentHeight;
+      // 插值
+      const currentY = startY - (streamLength + maxLength) * ratio;
+      // 位置限定 < parentHeight
+      let y = Math.min(currentY, parentHeight);
+      // 高度最小值
+      const h = Math.min(parentHeight - currentY, maxLength);
+      // 如果 rect上端点=y 超出 parent上端点 = 0, 则高度不断变小
+      let height;
+      if (y <= 0) {
+        // 必须先得到高度再将y置为0, 顺序很重要
+        height = Math.max(y + h, 0);
+        y = 0;
+      } else {
+        height = h;
       }
-    );
+      this.rect.setAttributes(
+        {
+          y,
+          height,
+          dy: Math.min(parentAttr.y1 - parentAttr.y, 0)
+        } as any,
+        false,
+        {
+          type: AttributeUpdateType.ANIMATE_PLAY,
+          animationState: {
+            ratio,
+            end
+          }
+        }
+      );
+    }
   }
 
   protected onUpdateLineOrArea(end: boolean, ratio: number, out: Record<string, any>) {
@@ -434,7 +495,7 @@ export class StreamLight extends ACustomAnimate<any> {
         c.curves.forEach((ci: any) => curves.push(ci));
       });
       return this._updateCurves(customPath, curves, totalLen, ratio);
-    } else if (g.type === 'area') {
+    } else if (g.type === 'area' && g.cacheArea?.top?.curves) {
       const cache = g.cacheArea as IAreaCacheItem;
       const totalLen = cache.top.curves.reduce((a, b) => a + b.getLength(), 0);
       return this._updateCurves(customPath, cache.top.curves, totalLen, ratio);
@@ -447,44 +508,46 @@ export class StreamLight extends ACustomAnimate<any> {
     let lastLen = 0;
     let start = false;
     for (let i = 0; i < curves.length; i++) {
-      const curveItem = curves[i];
-      const len = curveItem.getLength();
-      const startPercent = 1 - (lastLen + len - startLen) / len;
-      let endPercent = 1 - (lastLen + len - endLen) / len;
-      let curveForStart: ICubicBezierCurve;
-      if (lastLen < startLen && lastLen + len > startLen) {
-        start = true;
-        if (curveItem.p2 && curveItem.p3) {
-          const [_, curve2] = divideCubic(curveItem as ICubicBezierCurve, startPercent);
-          customPath.moveTo(curve2.p0.x, curve2.p0.y);
-          curveForStart = curve2;
-          // console.log(curve2.p0.x, curve2.p0.y);
-        } else {
-          const p = curveItem.getPointAt(startPercent);
-          customPath.moveTo(p.x, p.y);
-        }
-      }
-      if (lastLen < endLen && lastLen + len > endLen) {
-        if (curveItem.p2 && curveItem.p3) {
-          if (curveForStart) {
-            endPercent = (endLen - startLen) / curveForStart.getLength();
+      if (curves[i].defined !== false) {
+        const curveItem = curves[i];
+        const len = curveItem.getLength();
+        const startPercent = 1 - (lastLen + len - startLen) / len;
+        let endPercent = 1 - (lastLen + len - endLen) / len;
+        let curveForStart: ICubicBezierCurve;
+        if (lastLen < startLen && lastLen + len > startLen) {
+          start = true;
+          if (curveItem.p2 && curveItem.p3) {
+            const [_, curve2] = divideCubic(curveItem as ICubicBezierCurve, startPercent);
+            customPath.moveTo(curve2.p0.x, curve2.p0.y);
+            curveForStart = curve2;
+            // console.log(curve2.p0.x, curve2.p0.y);
+          } else {
+            const p = curveItem.getPointAt(startPercent);
+            customPath.moveTo(p.x, p.y);
           }
-          const [curve1] = divideCubic(curveForStart || (curveItem as ICubicBezierCurve), endPercent);
-          customPath.bezierCurveTo(curve1.p1.x, curve1.p1.y, curve1.p2.x, curve1.p2.y, curve1.p3.x, curve1.p3.y);
-        } else {
-          const p = curveItem.getPointAt(endPercent);
-          customPath.lineTo(p.x, p.y);
         }
-        break;
-      } else if (start) {
-        if (curveItem.p2 && curveItem.p3) {
-          const curve = curveForStart || curveItem;
-          customPath.bezierCurveTo(curve.p1.x, curve.p1.y, curve.p2.x, curve.p2.y, curve.p3.x, curve.p3.y);
-        } else {
-          customPath.lineTo(curveItem.p1.x, curveItem.p1.y);
+        if (lastLen < endLen && lastLen + len > endLen) {
+          if (curveItem.p2 && curveItem.p3) {
+            if (curveForStart) {
+              endPercent = (endLen - startLen) / curveForStart.getLength();
+            }
+            const [curve1] = divideCubic(curveForStart || (curveItem as ICubicBezierCurve), endPercent);
+            customPath.bezierCurveTo(curve1.p1.x, curve1.p1.y, curve1.p2.x, curve1.p2.y, curve1.p3.x, curve1.p3.y);
+          } else {
+            const p = curveItem.getPointAt(endPercent);
+            customPath.lineTo(p.x, p.y);
+          }
+          break;
+        } else if (start) {
+          if (curveItem.p2 && curveItem.p3) {
+            const curve = curveForStart || curveItem;
+            customPath.bezierCurveTo(curve.p1.x, curve.p1.y, curve.p2.x, curve.p2.y, curve.p3.x, curve.p3.y);
+          } else {
+            customPath.lineTo(curveItem.p1.x, curveItem.p1.y);
+          }
         }
+        lastLen += len;
       }
-      lastLen += len;
     }
   }
 
@@ -641,27 +704,55 @@ export class MotionPath extends ACustomAnimate<any> {
   }
 }
 
-export class TagPointsUpdate extends ACustomAnimate<{ points: IPointLike[] }> {
+export class TagPointsUpdate extends ACustomAnimate<{ points?: IPointLike[]; segments?: ISegment[] }> {
   protected fromPoints: IPointLike[];
   protected toPoints: IPointLike[];
   protected points: IPointLike[];
   protected interpolatePoints: [IPointLike, IPointLike][];
-  protected newPointAnimateType: 'grow' | 'appear';
+  protected newPointAnimateType: 'grow' | 'appear' | 'clip';
+  protected clipRange: number;
+  protected shrinkClipRange: number;
+  protected clipRangeByDimension: 'x' | 'y';
+  protected segmentsCache: number[];
 
   constructor(
     from: any,
     to: any,
     duration: number,
     easing: EasingType,
-    params?: { newPointAnimateType?: 'grow' | 'appear' }
+    params?: { newPointAnimateType?: 'grow' | 'appear' | 'clip'; clipRangeByDimension?: 'x' | 'y' }
   ) {
     super(from, to, duration, easing, params);
-    this.newPointAnimateType = params?.newPointAnimateType === 'appear' ? 'appear' : 'grow';
+    this.newPointAnimateType = params?.newPointAnimateType ?? 'grow';
+    this.clipRangeByDimension = params?.clipRangeByDimension ?? 'x';
+  }
+
+  private getPoints(attribute: typeof this.from, cache = false): IPointLike[] {
+    if (attribute.points) {
+      return attribute.points;
+    }
+
+    if (attribute.segments) {
+      const points = [] as IPointLike[];
+      if (!this.segmentsCache) {
+        this.segmentsCache = [];
+      }
+      attribute.segments.map(segment => {
+        if (segment.points) {
+          points.push(...segment.points);
+        }
+        if (cache) {
+          this.segmentsCache.push(segment.points?.length ?? 0);
+        }
+      });
+      return points;
+    }
+    return [];
   }
 
   onBind(): void {
-    const originFromPoints = this.from?.points;
-    const originToPoints = this.to?.points;
+    const originFromPoints = this.getPoints(this.from);
+    const originToPoints = this.getPoints(this.to, true);
     this.fromPoints = !originFromPoints ? [] : !Array.isArray(originFromPoints) ? [originFromPoints] : originFromPoints;
     this.toPoints = !originToPoints ? [] : !Array.isArray(originToPoints) ? [originToPoints] : originToPoints;
 
@@ -689,6 +780,28 @@ export class TagPointsUpdate extends ACustomAnimate<{ points: IPointLike[] }> {
         break;
       }
     }
+
+    if (this.newPointAnimateType === 'clip') {
+      if (this.toPoints.length !== 0) {
+        if (Number.isFinite(lastMatchedIndex)) {
+          this.clipRange =
+            this.toPoints[lastMatchedIndex][this.clipRangeByDimension] /
+            this.toPoints[this.toPoints.length - 1][this.clipRangeByDimension];
+          if (this.clipRange === 1) {
+            this.shrinkClipRange =
+              this.toPoints[lastMatchedIndex][this.clipRangeByDimension] /
+              this.fromPoints[this.fromPoints.length - 1][this.clipRangeByDimension];
+          }
+          if (!isValidNumber(this.clipRange)) {
+            this.clipRange = 0;
+          } else {
+            this.clipRange = clamp(this.clipRange, 0, 1);
+          }
+        } else {
+          this.clipRange = 0;
+        }
+      }
+    }
     // TODO: shrink removed points
     // if no point is matched, animation should start from toPoint[0]
     let prevMatchedPoint = this.toPoints[0];
@@ -699,7 +812,7 @@ export class TagPointsUpdate extends ACustomAnimate<{ points: IPointLike[] }> {
         return [matchedPoint, point];
       }
       // appear new point
-      if (this.newPointAnimateType === 'appear') {
+      if (this.newPointAnimateType === 'appear' || this.newPointAnimateType === 'clip') {
         return [point, point];
       }
       // grow new point
@@ -720,6 +833,13 @@ export class TagPointsUpdate extends ACustomAnimate<{ points: IPointLike[] }> {
     });
   }
 
+  onFirstRun(): void {
+    const lastClipRange = this.target.attribute.clipRange;
+    if (isValidNumber(lastClipRange * this.clipRange)) {
+      this.clipRange *= lastClipRange;
+    }
+  }
+
   onUpdate(end: boolean, ratio: number, out: Record<string, any>): void {
     // if not create new points, multi points animation might not work well.
     this.points = this.points.map((point, index) => {
@@ -727,7 +847,34 @@ export class TagPointsUpdate extends ACustomAnimate<{ points: IPointLike[] }> {
       newPoint.context = point.context;
       return newPoint;
     });
-    out.points = this.points;
+    if (this.clipRange) {
+      if (this.shrinkClipRange) {
+        // 折线变短
+        if (!end) {
+          out.points = this.fromPoints;
+          out.clipRange = this.clipRange - (this.clipRange - this.shrinkClipRange) * ratio;
+        } else {
+          out.points = this.toPoints;
+          out.clipRange = 1;
+        }
+        return;
+      }
+      out.clipRange = this.clipRange + (1 - this.clipRange) * ratio;
+    }
+    if (this.segmentsCache && this.to.segments) {
+      let start = 0;
+      out.segments = this.to.segments.map((segment, index) => {
+        const end = start + this.segmentsCache[index];
+        const points = this.points.slice(start, end);
+        start = end;
+        return {
+          ...segment,
+          points
+        };
+      });
+    } else {
+      out.points = this.points;
+    }
   }
 }
 
@@ -1037,74 +1184,6 @@ export class RotateBySphereAnimate extends ACustomAnimate<any> {
     out.zIndex = out.z * -10000;
 
     cb && cb(out);
-  }
-}
-
-export class GroupFadeIn extends ACustomAnimate<any> {
-  declare target: IGroup;
-
-  getEndProps(): Record<string, any> {
-    return {};
-  }
-
-  onBind(): void {
-    this.target.setTheme({
-      common: {
-        opacity: 0
-      }
-    });
-    return;
-  }
-
-  onEnd(): void {
-    this.target.setTheme({
-      common: {
-        opacity: 1
-      }
-    });
-    return;
-  }
-
-  onUpdate(end: boolean, ratio: number, out: Record<string, any>): void {
-    this.target.setTheme({
-      common: {
-        opacity: ratio
-      }
-    });
-  }
-}
-
-export class GroupFadeOut extends ACustomAnimate<any> {
-  declare target: IGroup;
-
-  getEndProps(): Record<string, any> {
-    return {};
-  }
-
-  onBind(): void {
-    this.target.setTheme({
-      common: {
-        opacity: 1
-      }
-    });
-    return;
-  }
-
-  onEnd(): void {
-    this.target.setTheme({
-      common: {
-        opacity: 0
-      }
-    });
-    return;
-  }
-
-  onUpdate(end: boolean, ratio: number, out: Record<string, any>): void {
-    this.target.setTheme({
-      common: {
-        opacity: 1 - ratio
-      }
-    });
   }
 }
 

@@ -10,10 +10,14 @@ import type {
   IColor,
   ILine,
   IArea,
-  IRichText
+  IRichText,
+  ILineGraphicAttribute,
+  ILinearGradient
 } from '@visactor/vrender-core';
-import { graphicCreator, AttributeUpdateType, IContainPointMode } from '@visactor/vrender-core';
+// eslint-disable-next-line no-duplicate-imports
+import { graphicCreator, AttributeUpdateType, IContainPointMode, CustomPath2D } from '@visactor/vrender-core';
 import type { IAABBBounds, IBoundsLike, IPointLike } from '@visactor/vutils';
+// eslint-disable-next-line no-duplicate-imports
 import {
   isFunction,
   isEmpty,
@@ -30,7 +34,8 @@ import type { PointLocationCfg } from '../core/type';
 import { labelSmartInvert, contrastAccessibilityChecker, smartInvertStrategy } from '../util/label-smartInvert';
 import { createTextGraphicByType, getMarksByName, getNoneGroupMarksByName, traverseGroup } from '../util';
 import { StateValue } from '../constant';
-import type { Bitmap } from './overlap';
+import type { Bitmap, BitmapTool } from './overlap';
+// eslint-disable-next-line no-duplicate-imports
 import { bitmapTool, boundToRange, canPlace, clampText, place } from './overlap';
 import type {
   BaseLabelAttrs,
@@ -41,12 +46,15 @@ import type {
   ILabelEnterAnimation,
   ILabelExitAnimation,
   ILabelUpdateAnimation,
-  LabelContent
+  LabelContent,
+  ShiftYStrategy,
+  Strategy
 } from './type';
 import { DefaultLabelAnimation, getAnimationAttributes, updateAnimation } from './animate/animate';
 import { connectLineBetweenBounds, getPointsOfLineArea } from './util';
 import type { ComponentOptions } from '../interface';
 import { loadLabelComponent } from './register';
+import { shiftY } from './overlap/shiftY';
 
 loadLabelComponent();
 export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
@@ -58,10 +66,11 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
 
   protected _bitmap?: Bitmap;
 
+  // parsed animation config
   protected _animationConfig?: {
-    enter: ILabelEnterAnimation;
-    exit: ILabelExitAnimation;
-    update: ILabelUpdateAnimation;
+    enter: ILabelEnterAnimation | false;
+    exit: ILabelExitAnimation | false;
+    update: ILabelUpdateAnimation | false;
   };
 
   static defaultAttributes: Partial<BaseLabelAttrs> = {
@@ -93,15 +102,14 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
 
   protected _idToPoint: Map<string, IPointLike>;
 
-  onAfterLabelOverlap?: (bitmap: Bitmap) => void;
-
   private _lastHover: IGraphic;
   private _lastSelect: IGraphic;
 
   private _enableAnimation: boolean;
 
   constructor(attributes: BaseLabelAttrs, options?: ComponentOptions) {
-    super(options?.skipDefault ? attributes : merge({}, LabelBase.defaultAttributes, attributes));
+    const { data, ...restAttributes } = attributes;
+    super(options?.skipDefault ? attributes : { data, ...merge({}, LabelBase.defaultAttributes, restAttributes) });
   }
 
   /**
@@ -122,22 +130,42 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
     return;
   }
 
+  protected _getLabelLinePoints(text: IText | IRichText, baseMark?: IGraphic) {
+    return connectLineBetweenBounds(text.AABBBounds, baseMark?.AABBBounds);
+  }
+
   protected _createLabelLine(text: IText | IRichText, baseMark?: IGraphic): ILine | undefined {
-    const points = connectLineBetweenBounds(text.AABBBounds, baseMark?.AABBBounds);
+    const points = this._getLabelLinePoints(text, baseMark);
     if (points) {
-      const line = graphicCreator.line({
+      const lineGraphic = graphicCreator.line({
         points
       });
 
+      const { line = {} } = text.attribute as any;
+
+      if (line.customShape) {
+        const customShape = line.customShape;
+        lineGraphic.pathProxy = (attrs: Partial<ILineGraphicAttribute>) => {
+          return customShape(
+            {
+              text,
+              baseMark: baseMark
+            },
+            attrs,
+            new CustomPath2D()
+          );
+        };
+      }
+
       if (baseMark && baseMark.attribute.fill) {
-        line.setAttribute('stroke', baseMark.attribute.fill);
+        lineGraphic.setAttribute('stroke', baseMark.attribute.fill);
       }
 
       if (this.attribute.line && !isEmpty(this.attribute.line.style)) {
-        line.setAttributes(this.attribute.line.style);
+        lineGraphic.setAttributes(this.attribute.line.style);
       }
-      this._setStatesOfLabelLine(line);
-      return line;
+      this._setStatesOfLabelLine(lineGraphic);
+      return lineGraphic;
     }
   }
 
@@ -152,6 +180,12 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
 
     if (isFunction(dataFilter)) {
       data = dataFilter(data);
+    }
+
+    if (data && data.length) {
+      // 数据保护，防止重复 id 造成不可预知的问题
+      const seenIds = new Set();
+      data = data.filter(d => !seenIds.has(d.id) && seenIds.add(d.id));
     }
 
     let labels: (IText | IRichText)[] = this._initText(data);
@@ -179,6 +213,14 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
       if (overlap !== false) {
         labels = this._overlapping(labels);
       }
+    }
+
+    if (isFunction(this.attribute.onAfterOverlapping)) {
+      this.attribute.onAfterOverlapping(
+        labels as Text[],
+        this.getRelatedGraphic.bind(this),
+        this._isCollectionBase ? (d: LabelItem) => this._idToPoint.get(d.id) : null
+      );
     }
 
     if (labels && labels.length) {
@@ -371,13 +413,23 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
     }
 
     if (this.attribute.animation !== false) {
-      const animation = isObject(this.attribute.animation) ? this.attribute.animation : {};
+      const { animation, animationEnter, animationExit, animationUpdate } = this.attribute;
+      const animationCfg = isObject(animation) ? animation : {};
       this._animationConfig = {
-        enter: merge({}, DefaultLabelAnimation, animation, this.attribute.animationEnter ?? {}),
-        exit: merge({}, DefaultLabelAnimation, animation, this.attribute.animationExit ?? {}),
-        update: isArray(this.attribute.animationUpdate)
-          ? this.attribute.animationUpdate
-          : merge({}, DefaultLabelAnimation, animation, this.attribute.animationUpdate ?? {})
+        enter: animationEnter !== false ? merge({}, DefaultLabelAnimation, animationCfg, animationEnter ?? {}) : false,
+        exit: animationExit !== false ? merge({}, DefaultLabelAnimation, animationCfg, animationExit ?? {}) : false,
+        update:
+          animationUpdate !== false
+            ? isArray(animationUpdate)
+              ? animationUpdate
+              : merge({}, DefaultLabelAnimation, animationCfg, animationUpdate ?? {})
+            : false
+      };
+    } else {
+      this._animationConfig = {
+        enter: false,
+        exit: false,
+        update: false
       };
     }
   }
@@ -449,7 +501,6 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
       return [];
     }
     const option = (isObject(this.attribute.overlap) ? this.attribute.overlap : {}) as OverlapAttrs;
-    const result: (IText | IRichText)[] = [];
     const baseMarkGroup = this.getBaseMarkGroup();
 
     const size = option.size ?? {
@@ -461,6 +512,103 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
       return labels;
     }
 
+    const { strategy, priority } = option;
+
+    const bmpTool = this._bmpTool || bitmapTool(size.width, size.height);
+    const bitmap = this._bitmap || bmpTool.bitmap();
+
+    if (priority) {
+      labels = labels.sort((a, b) => priority((b.attribute as any).data) - priority((a.attribute as any).data));
+    }
+
+    if ((strategy as ShiftYStrategy)?.type === 'shiftY') {
+      return this._overlapGlobal(labels, option, bmpTool, bitmap);
+    }
+    return this._overlapByStrategy(labels, option, bmpTool, bitmap);
+  }
+
+  protected _overlapGlobal(labels: (IText | IRichText)[], option: OverlapAttrs, bmpTool: BitmapTool, bitmap: Bitmap) {
+    let result = labels.filter(label => label.attribute.visible && label.attribute.opacity !== 0);
+    const { clampForce = true, hideOnHit = true, overlapPadding, strategy } = option;
+    if (clampForce) {
+      for (let i = 0; i < result.length; i++) {
+        const text = labels[i];
+        const { dx = 0, dy = 0 } = clampText(text as IText, bmpTool.width, bmpTool.height, bmpTool.padding);
+        if (dx !== 0 || dy !== 0) {
+          text.setAttributes({ x: text.attribute.x + dx, y: text.attribute.y + dy });
+          text._isClamped = true;
+        }
+      }
+    }
+    result = shiftY(result as any, {
+      maxY: bmpTool.height,
+      ...(strategy as ShiftYStrategy),
+      labelling: (text: IText) => {
+        const baseMark = this.getRelatedGraphic(text.attribute);
+        const graphicBound = this._isCollectionBase
+          ? this.getGraphicBounds(null, this._idToPoint.get((text.attribute as any).id))
+          : this.getGraphicBounds(baseMark, text);
+        return this.labeling(text.AABBBounds, graphicBound, 'bottom', this.attribute.offset);
+      }
+    });
+
+    for (let i = 0; i < result.length; i++) {
+      const text = result[i];
+      const bounds = text.AABBBounds;
+      const range = boundToRange(bmpTool, bounds, true);
+      if (canPlace(bmpTool, bitmap, bounds, clampForce, overlapPadding)) {
+        bitmap.setRange(range);
+      } else {
+        if (clampForce) {
+          const placedAfterClampForce = this._processClampForce(text as IText, bmpTool, bitmap, overlapPadding);
+          if (placedAfterClampForce) {
+            continue;
+          }
+        }
+        if (hideOnHit) {
+          text.setAttributes({ visible: false });
+        } else {
+          bitmap.setRange(range);
+        }
+      }
+    }
+    return result;
+  }
+
+  protected _processClampForce(text: IText, bmpTool: BitmapTool, bitmap: Bitmap, overlapPadding = 0) {
+    const { dy = 0, dx = 0 } = clampText(text as IText, bmpTool.width, bmpTool.height, bmpTool.padding);
+    if (dx === 0 && dy === 0) {
+      // 再次检查，若不考虑边界，仍然可以放得下，代表当前 text 没有与其他 text 重叠
+      if (canPlace(bmpTool, bitmap, text.AABBBounds, false, overlapPadding)) {
+        bitmap.setRange(boundToRange(bmpTool, text.AABBBounds, true));
+        return true;
+      }
+    } else if (
+      canPlace(
+        bmpTool,
+        bitmap,
+        {
+          x1: text.AABBBounds.x1 + dx,
+          x2: text.AABBBounds.x2 + dx,
+          y1: text.AABBBounds.y1 + dy,
+          y2: text.AABBBounds.y2 + dy
+        }
+        // 向内 clamp 只处理超出的位移量，不叠加 overlapPadding
+      )
+    ) {
+      text.setAttributes({ x: text.attribute.x + dx, y: text.attribute.y + dy });
+      bitmap.setRange(boundToRange(bmpTool, text.AABBBounds, true));
+      return true;
+    }
+    return false;
+  }
+
+  protected _overlapByStrategy(
+    labels: (IText | IRichText)[],
+    option: OverlapAttrs,
+    bmpTool: BitmapTool,
+    bitmap: Bitmap
+  ) {
     const {
       avoidBaseMark,
       strategy = [],
@@ -469,10 +617,9 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
       avoidMarks = [],
       overlapPadding
     } = option;
-    const bmpTool = this._bmpTool || bitmapTool(size.width, size.height);
-    const bitmap = this._bitmap || bmpTool.bitmap();
-    const checkBounds = strategy.some(s => s.type === 'bound');
+    const result: (IText | IRichText)[] = [];
 
+    const checkBounds = (strategy as Strategy[]).some(s => s.type === 'bound');
     // 躲避关联的基础图元
     if (avoidBaseMark) {
       this._baseMarks?.forEach(mark => {
@@ -494,7 +641,7 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
     }
 
     for (let i = 0; i < labels.length; i++) {
-      if (labels[i].visible === false) {
+      if (labels[i].attribute.visible === false) {
         continue;
       }
 
@@ -504,7 +651,6 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
       if (!isRectIntersect(baseMark.AABBBounds, { x1: 0, x2: bmpTool.width, y1: 0, y2: bmpTool.height }, true)) {
         continue;
       }
-
       // 默认位置可以放置
       if (canPlace(bmpTool, bitmap, text.AABBBounds, clampForce, overlapPadding)) {
         // 如果配置了限制在图形内部，需要提前判断；
@@ -528,7 +674,7 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
 
       let hasPlace: ReturnType<typeof place> = false;
       // 发生碰撞，根据策略寻找可放置的位置
-      for (let j = 0; j < strategy.length; j++) {
+      for (let j = 0; j < (strategy as Strategy[]).length; j++) {
         hasPlace = place(
           bmpTool,
           bitmap,
@@ -549,30 +695,8 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
 
       // 尝试向内挤压
       if (!hasPlace && clampForce) {
-        // 向内挤压不考虑 overlapPadding
-        const { dx = 0, dy = 0 } = clampText(text as IText, bmpTool.width, bmpTool.height);
-        if (dx === 0 && dy === 0) {
-          if (canPlace(bmpTool, bitmap, text.AABBBounds)) {
-            // xy方向偏移都为0，意味着不考虑 overlapPadding 时，实际上可以放得下
-            bitmap.setRange(boundToRange(bmpTool, text.AABBBounds, true));
-            result.push(text);
-            continue;
-          }
-        } else if (
-          canPlace(
-            bmpTool,
-            bitmap,
-            {
-              x1: text.AABBBounds.x1 + dx,
-              x2: text.AABBBounds.x2 + dx,
-              y1: text.AABBBounds.y1 + dy,
-              y2: text.AABBBounds.y2 + dy
-            }
-            // 向内 clamp 只处理超出的位移量，不叠加 overlapPadding
-          )
-        ) {
-          text.setAttributes({ x: text.attribute.x + dx, y: text.attribute.y + dy });
-          bitmap.setRange(boundToRange(bmpTool, text.AABBBounds, true));
+        const placedAfterClampForce = this._processClampForce(text as IText, bmpTool, bitmap, overlapPadding);
+        if (placedAfterClampForce) {
           result.push(text);
           continue;
         }
@@ -580,11 +704,6 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
 
       !hasPlace && !hideOnHit && result.push(text);
     }
-
-    if (isFunction(this.onAfterLabelOverlap)) {
-      this.onAfterLabelOverlap(bitmap);
-    }
-
     return result;
   }
 
@@ -596,8 +715,11 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
     return (this.getRootNode() as IGroup).find(node => node.name === baseMarkGroupName, true) as IGroup;
   }
 
-  protected getGraphicBounds(graphic?: IGraphic, point?: Partial<PointLocationCfg>, position?: string): IBoundsLike;
-  protected getGraphicBounds(graphic?: IGraphic, point: Partial<PointLocationCfg> = {}): IBoundsLike {
+  protected getGraphicBounds(
+    graphic?: IGraphic,
+    point: Partial<PointLocationCfg> = {},
+    position?: string
+  ): IBoundsLike {
     if (graphic) {
       if (graphic.attribute.visible !== false) {
         return graphic.AABBBounds;
@@ -605,23 +727,23 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
       const { x, y } = graphic.attribute;
       return { x1: x, x2: x, y1: y, y2: y } as IBoundsLike;
     }
+    if (point && position && position === 'inside-middle') {
+      const { x, y, x1 = x, y1 = y } = point;
+      return {
+        x1: (x + x1) / 2,
+        x2: (x + x1) / 2,
+        y1: (y + y1) / 2,
+        y2: (y + y1) / 2
+      };
+    }
     const { x, y } = point;
     return { x1: x, x2: x, y1: y, y2: y } as IBoundsLike;
   }
 
   protected _renderLabels(labels: (IText | IRichText)[]) {
-    const disableAnimation = this._enableAnimation === false || this.attribute.animation === false;
-
-    if (disableAnimation) {
-      this._renderWithOutAnimation(labels);
-    } else {
-      this._renderWithAnimation(labels);
-    }
-  }
-
-  protected _renderWithAnimation(labels: (IText | IRichText)[]) {
-    const currentTextMap: Map<any, { text: IText | IRichText; labelLine?: ILine }> = new Map();
-    const prevTextMap: Map<any, { text: IText | IRichText; labelLine?: ILine }> = this._graphicToText || new Map();
+    const { syncState } = this.attribute;
+    const currentTextMap: Map<any, LabelContent> = new Map();
+    const prevTextMap: Map<any, LabelContent> = this._graphicToText || new Map();
     const texts = [] as (IText | IRichText)[];
     const labelLines = [] as ILine[];
     const { visible: showLabelLine } = this.attribute.line ?? {};
@@ -629,119 +751,139 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
     labels &&
       labels.forEach((text, index) => {
         const relatedGraphic = this.getRelatedGraphic(text.attribute);
-        const textId = (text.attribute as LabelItem).id;
-        const textKey = this._isCollectionBase ? textId : relatedGraphic;
+        const textKey = this._isCollectionBase ? (text.attribute as LabelItem).id : relatedGraphic;
         const state = prevTextMap?.get(textKey) ? 'update' : 'enter';
-        let labelLine: ILine;
+        let labelLine;
         if (showLabelLine) {
           labelLine = this._createLabelLine(text as IText, relatedGraphic);
         }
-        // TODO: add animate
+        if (syncState) {
+          this.updateStatesOfLabels([labelLine ? { text, labelLine } : { text }], relatedGraphic.currentStates ?? []);
+        }
+
         if (state === 'enter') {
           texts.push(text);
           currentTextMap.set(textKey, labelLine ? { text, labelLine } : { text });
-          if (relatedGraphic) {
-            const { from, to } = getAnimationAttributes(text.attribute, 'fadeIn');
-            this.add(text);
-
-            if (labelLine) {
-              labelLines.push(labelLine);
-              this.add(labelLine);
-            }
-
-            this._syncStateWithRelatedGraphic(relatedGraphic);
-            // enter的时长如果不是大于0，那么直接跳过动画
-            this._animationConfig.enter.duration > 0 &&
-              relatedGraphic.once('animate-bind', a => {
-                // text和labelLine共用一个from
-                text.setAttributes(from);
-                labelLine && labelLine.setAttributes(from);
-                const listener = this._afterRelatedGraphicAttributeUpdate(
-                  text,
-                  texts,
-                  labelLine,
-                  labelLines,
-                  index,
-                  relatedGraphic,
-                  to,
-                  this._animationConfig.enter
-                );
-                relatedGraphic.on('afterAttributeUpdate', listener);
-              });
-          }
+          this._addLabel({ text, labelLine }, texts, labelLines, index);
         } else if (state === 'update') {
           const prevLabel = prevTextMap.get(textKey);
           prevTextMap.delete(textKey);
           currentTextMap.set(textKey, prevLabel);
-          const prevText = prevLabel.text;
-          const { duration, easing } = this._animationConfig.update;
-          updateAnimation(prevText as Text, text as Text, this._animationConfig.update);
-          if (prevLabel.labelLine && labelLine) {
-            prevLabel.labelLine.animate().to(labelLine.attribute, duration, easing);
-          }
+          this._updateLabel(prevLabel, { text, labelLine });
         }
       });
-    prevTextMap.forEach(label => {
-      label.text
-        ?.animate()
-        .to(
-          getAnimationAttributes(label.text.attribute, 'fadeOut').to,
-          this._animationConfig.exit.duration,
-          this._animationConfig.exit.easing
-        )
-        .onEnd(() => {
-          this.removeChild(label.text);
-          if (label.labelLine) {
-            this.removeChild(label.labelLine);
-          }
-        });
-    });
+
+    this._removeLabel(prevTextMap);
 
     this._graphicToText = currentTextMap;
   }
 
-  protected _renderWithOutAnimation(labels: (IText | IRichText)[]) {
-    const currentTextMap: Map<any, LabelContent> = new Map();
-    const prevTextMap: Map<any, LabelContent> = this._graphicToText || new Map();
-    const texts = [] as (IText | IRichText)[];
-    const { visible: showLabelLine } = this.attribute.line ?? {};
+  protected _addLabel(
+    label: LabelContent,
+    texts?: LabelContent['text'][],
+    labelLines?: LabelContent['labelLine'][],
+    index?: number
+  ) {
+    const { text, labelLine } = label;
+    // TODO: 或许还需要判断关联图元是否有动画？
+    const relatedGraphic = this.getRelatedGraphic(text.attribute);
+    this._syncStateWithRelatedGraphic(relatedGraphic);
 
-    labels.forEach(text => {
-      const relatedGraphic = this.getRelatedGraphic(text.attribute);
-      const state = prevTextMap?.get(relatedGraphic) ? 'update' : 'enter';
-      const textKey = this._isCollectionBase ? (text.attribute as LabelItem).id : relatedGraphic;
-      let labelLine;
-      if (showLabelLine) {
-        labelLine = this._createLabelLine(text as IText, relatedGraphic);
-      }
+    if (this._enableAnimation !== false && this._animationConfig.enter !== false) {
+      if (relatedGraphic) {
+        const { from, to } = getAnimationAttributes(text.attribute, 'fadeIn');
+        if (text) {
+          this.add(text);
+        }
 
-      if (state === 'enter') {
-        texts.push(text);
-        currentTextMap.set(textKey, labelLine ? { text, labelLine } : { text });
-        this.add(text);
         if (labelLine) {
+          labelLines.push(labelLine);
           this.add(labelLine);
         }
-        this._syncStateWithRelatedGraphic(relatedGraphic);
-      } else if (state === 'update') {
-        const prevLabel = prevTextMap.get(textKey);
-        prevTextMap.delete(textKey);
-        currentTextMap.set(textKey, prevLabel);
-        prevLabel.text.setAttributes(text.attribute as any);
-        if (prevLabel.labelLine && labelLine) {
-          prevLabel.labelLine.setAttributes(labelLine.attribute);
-        }
-      }
-    });
 
-    prevTextMap.forEach(label => {
+        // enter的时长如果不是大于0，那么直接跳过动画
+        this._animationConfig.enter.duration > 0 &&
+          relatedGraphic.once('animate-bind', a => {
+            // text和labelLine共用一个from
+            text.setAttributes(from);
+            labelLine && labelLine.setAttributes(from);
+            const listener = this._afterRelatedGraphicAttributeUpdate(
+              text,
+              texts,
+              labelLine,
+              labelLines,
+              index,
+              relatedGraphic,
+              to,
+              this._animationConfig.enter as ILabelEnterAnimation
+            );
+            relatedGraphic.on('afterAttributeUpdate', listener);
+          });
+      }
+    } else {
+      if (text) {
+        this.add(text);
+      }
+      if (labelLine) {
+        this.add(labelLine);
+      }
+    }
+  }
+
+  protected _updateLabel(prevLabel: LabelContent, currentLabel: LabelContent) {
+    const { text: prevText, labelLine: prevLabelLine } = prevLabel;
+    const { text: curText, labelLine: curLabelLine } = currentLabel;
+    if (this._enableAnimation !== false && this._animationConfig.update !== false) {
+      const { duration, easing } = this._animationConfig.update;
+      updateAnimation(prevText, curText, this._animationConfig.update);
+      if (prevLabelLine && curLabelLine) {
+        prevLabel.labelLine.animate().to(curLabelLine.attribute, duration, easing);
+      }
+    } else {
+      prevLabel.text.setAttributes(curText.attribute as any);
+      if (prevLabelLine && curLabelLine) {
+        prevLabel.labelLine.setAttributes(curLabelLine.attribute);
+      }
+    }
+  }
+
+  protected _removeLabel(textMap: Map<any, LabelContent>) {
+    const removeLabelAndLine = (label: LabelContent) => {
       this.removeChild(label.text);
       if (label.labelLine) {
         this.removeChild(label.labelLine);
       }
-    });
+    };
 
-    this._graphicToText = currentTextMap;
+    if (this._enableAnimation !== false && this._animationConfig.exit !== false) {
+      const { duration, easing } = this._animationConfig.exit;
+      textMap.forEach(label => {
+        label.text
+          ?.animate()
+          .to(getAnimationAttributes(label.text.attribute, 'fadeOut').to, duration, easing)
+          .onEnd(() => {
+            removeLabelAndLine(label);
+          });
+      });
+    } else {
+      textMap.forEach(label => {
+        removeLabelAndLine(label);
+      });
+    }
+  }
+
+  private updateStatesOfLabels(labels: LabelContent[], currentStates?: string[]) {
+    labels.forEach(label => {
+      if (label) {
+        if (label.text) {
+          label.text.useStates(currentStates);
+        }
+
+        if (label.labelLine) {
+          label.labelLine.useStates(currentStates);
+        }
+      }
+    });
   }
 
   protected _handleRelatedGraphicSetState = (e: any) => {
@@ -752,22 +894,12 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
       const currentStates = e.target?.currentStates ?? [];
       const labels = this._isCollectionBase ? [...this._graphicToText.values()] : [this._graphicToText.get(e.target)];
 
-      labels.forEach(label => {
-        if (label) {
-          if (label.text) {
-            label.text.useStates(currentStates);
-          }
-
-          if (label.labelLine) {
-            label.labelLine.useStates(currentStates);
-          }
-        }
-      });
+      this.updateStatesOfLabels(labels, currentStates);
     }
   };
 
   protected _syncStateWithRelatedGraphic(relatedGraphic: IGraphic) {
-    if (this.attribute.syncState) {
+    if (this.attribute.syncState && relatedGraphic) {
       relatedGraphic.on('afterAttributeUpdate', this._handleRelatedGraphicSetState);
     }
   }
@@ -844,7 +976,7 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
             if (
               point &&
               (!text.animates || !text.animates.has('label-animate')) &&
-              relatedGraphic.containsPoint(point.x, point.y, IContainPointMode.LOCAL, this.stage?.pickerService)
+              relatedGraphic.containsPoint(point.x, point.y, IContainPointMode.LOCAL, this.stage?.getPickerService())
             ) {
               text.animate({ onStart }).wait(delay).to(to, duration, easing);
               labelLine && labelLine.animate().wait(delay).to(to, duration, easing);
@@ -862,7 +994,7 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
 
   protected _smartInvert(labels: (IText | IRichText)[]) {
     const option = (isObject(this.attribute.smartInvert) ? this.attribute.smartInvert : {}) as SmartInvertAttrs;
-    const { textType, contrastRatiosThreshold, alternativeColors, mode } = option;
+    const { textType, contrastRatiosThreshold, alternativeColors, mode, interactInvertType } = option;
     const fillStrategy = option.fillStrategy ?? 'invertBase';
     const strokeStrategy = option.strokeStrategy ?? 'base';
     const brightColor = option.brightColor ?? '#ffffff';
@@ -888,9 +1020,18 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
        * similarBase（智能反色的补色），
        * null（不执行智能反色，保持fill设置的颜色）
        * */
-      const backgroundColor = baseMark.attribute.fill as IColor;
-      const foregroundColor = label.attribute.fill as IColor;
-      const baseColor = backgroundColor;
+      let backgroundColor = baseMark.attribute.fill as IColor;
+      let foregroundColor = label.attribute.fill as IColor;
+
+      if (isObject(backgroundColor) && backgroundColor.gradient) {
+        const firstStopColor = (backgroundColor as ILinearGradient).stops?.[0]?.color;
+
+        if (firstStopColor) {
+          backgroundColor = firstStopColor;
+          foregroundColor = firstStopColor; // 渐变色的时候，标签的颜色可能会和背景色不一致，所以需要设置为相同的颜色
+        }
+      }
+
       const invertColor = labelSmartInvert(
         foregroundColor,
         backgroundColor,
@@ -900,57 +1041,48 @@ export class LabelBase<T extends BaseLabelAttrs> extends AbstractComponent<T> {
         mode
       );
       const similarColor = contrastAccessibilityChecker(invertColor, brightColor) ? brightColor : darkColor;
+      const isInside = this._canPlaceInside(label.AABBBounds, baseMark.AABBBounds);
+      const isIntersect =
+        !isInside && label.AABBBounds && baseMark.AABBBounds && baseMark.AABBBounds.intersects(label.AABBBounds);
 
-      if (outsideEnable) {
-        const fill = smartInvertStrategy(fillStrategy, baseColor, invertColor, similarColor);
+      if (isInside || outsideEnable || (isIntersect && interactInvertType === 'inside')) {
+        // 按照标签展示在柱子内部的情况，执行反色逻辑
+        const fill = smartInvertStrategy(fillStrategy, backgroundColor, invertColor, similarColor);
         fill && label.setAttributes({ fill });
 
-        if (label.attribute.lineWidth === 0) {
+        if (label.attribute.lineWidth === 0 || label.attribute.strokeOpacity === 0) {
           continue;
         }
 
-        const stroke = smartInvertStrategy(strokeStrategy, baseColor, invertColor, similarColor);
+        const stroke = smartInvertStrategy(strokeStrategy, backgroundColor, invertColor, similarColor);
         stroke && label.setAttributes({ stroke });
-      } else {
-        const isInside = this._canPlaceInside(label.AABBBounds, baseMark.AABBBounds);
-        if (isInside) {
-          const fill = smartInvertStrategy(fillStrategy, baseColor, invertColor, similarColor);
-          fill && label.setAttributes({ fill });
-
-          if (label.attribute.lineWidth === 0) {
-            continue;
-          }
-
-          const stroke = smartInvertStrategy(strokeStrategy, baseColor, invertColor, similarColor);
-          stroke && label.setAttributes({ stroke });
-        } else {
-          /** 当label无法设置stroke时，不进行反色计算（容易反色为白色与白色背景混合不可见） */
-          if (label.attribute.lineWidth === 0) {
-            continue;
-          }
-
-          /** 当label设置stroke时，保留stroke设置的颜色，根据stroke对fill做反色 */
-          if (label.attribute.stroke) {
-            label.setAttributes({
-              fill: labelSmartInvert(
-                label.attribute.fill as IColor,
-                label.attribute.stroke as IColor,
-                textType,
-                contrastRatiosThreshold,
-                alternativeColors,
-                mode
-              )
-            });
-            continue;
-          }
-
-          /** 当label未设置stroke，且可设置stroke时，正常计算 */
-          const fill = smartInvertStrategy(fillStrategy, baseColor, invertColor, similarColor);
-          fill && label.setAttributes({ fill });
-
-          const stroke = smartInvertStrategy(strokeStrategy, baseColor, invertColor, similarColor);
-          stroke && label.setAttributes({ stroke });
+      } else if (isIntersect && interactInvertType !== 'none') {
+        // 存在相交的情况
+        /** 当label无法设置stroke时，不进行反色计算（容易反色为白色与白色背景混合不可见） */
+        if (label.attribute.lineWidth === 0 || label.attribute.strokeOpacity === 0) {
+          continue;
         }
+        /** 当label设置stroke时，保留stroke设置的颜色，根据stroke对fill做反色 */
+        if (label.attribute.stroke) {
+          // stroke 作为背景色进行反色计算
+          label.setAttributes({
+            fill: labelSmartInvert(
+              label.attribute.fill as IColor,
+              label.attribute.stroke as IColor,
+              textType,
+              contrastRatiosThreshold,
+              alternativeColors,
+              mode
+            )
+          });
+          continue;
+        }
+        /** 当label未设置stroke，且可设置stroke时，正常计算 */
+        const fill = smartInvertStrategy(fillStrategy, backgroundColor, invertColor, similarColor);
+        fill && label.setAttributes({ fill });
+
+        const stroke = smartInvertStrategy(strokeStrategy, backgroundColor, invertColor, similarColor);
+        stroke && label.setAttributes({ stroke });
       }
     }
   }

@@ -4,10 +4,12 @@ group: graphic-richtext
 title: basic-richtext
 keywords: richtext
 order: 1-0
-cover: http://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/richtext-basic1.png
+cover: https://lf9-dp-fe-cms-tos.byteorg.com/obj/bit-cloud/vrender/richtext-basic1.png
 ---
 
 # richtext graphic
+
+The `RichText` element is a type of graphic element used to display and handle diverse text content, widely used in graphical user interfaces, web design, and data visualization. Unlike plain text, rich text elements support various text formats and styles, making text information more rich and vivid.
 
 ## code demo
 

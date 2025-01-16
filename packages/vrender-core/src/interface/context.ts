@@ -34,6 +34,7 @@ export interface IStrokeStyleParams {
   lineJoin?: CanvasLineJoin;
   miterLimit?: number;
   opacity?: number;
+  keepStrokeScale?: boolean;
 }
 export interface ITextStyleParams {
   font?: string;
@@ -60,6 +61,7 @@ export interface IContext2d extends Releaseable {
   camera?: ICamera;
   modelMatrix?: mat4;
   drawPromise?: Promise<any>;
+  baseGlobalAlpha?: number;
   // 属性代理
   fillStyle: string | CanvasGradient | CanvasPattern;
   disableFill?: boolean;

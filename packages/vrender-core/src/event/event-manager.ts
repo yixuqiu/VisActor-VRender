@@ -54,6 +54,7 @@ type EventManagerConfig = {
    * @default 200
    */
   clickInterval?: number;
+  supportsTouchEvents?: boolean;
 };
 
 type EmitterListener = { fn: (...args: any[]) => any; context: any; once: boolean };
@@ -72,6 +73,7 @@ export class EventManager {
 
   cursor: Cursor | string;
   cursorTarget: IEventTarget | null = null;
+  pauseNotify: boolean = false;
 
   protected mappingTable: Record<
     string,
@@ -224,6 +226,9 @@ export class EventManager {
   }
 
   protected notifyTarget(e: FederatedEvent, type?: string): void {
+    if (this.pauseNotify) {
+      return;
+    }
     type = type ?? e.type;
     const key = e.eventPhase === e.CAPTURING_PHASE || e.eventPhase === e.AT_TARGET ? `${type}capture` : type;
 
@@ -516,6 +521,7 @@ export class EventManager {
 
       clickEvent.target = clickTarget;
       clickEvent.path = [];
+      clickEvent.detailPath = [];
 
       if (!trackingData.clicksByButton[from.button]) {
         trackingData.clicksByButton[from.button] = {
@@ -547,7 +553,7 @@ export class EventManager {
           // 双击
           this.dispatchEvent(clickEvent, 'dblclick');
         }
-      } else if (clickEvent.pointerType === 'touch') {
+      } else if (clickEvent.pointerType === 'touch' && this._config.supportsTouchEvents) {
         this.dispatchEvent(clickEvent, 'tap');
         if (clickHistory.clickCount === 2) {
           // 双击
@@ -681,6 +687,8 @@ export class EventManager {
 
     event.target = from.target;
     event.path = from.composedPath().slice();
+    const p = from.composedDetailPath();
+    event.detailPath = p && p.slice();
     event.type = type ?? event.type;
 
     return event;
@@ -768,6 +776,7 @@ export class EventManager {
     event.eventPhase = event.NONE;
     event.currentTarget = null;
     event.path = [];
+    event.detailPath = [];
     event.target = null;
 
     return event;

@@ -43,6 +43,8 @@ export interface IStageParams {
   title: string;
   // 是否开启自动渲染
   autoRender: boolean;
+  // 是否开启自动刷新
+  autoRefresh: boolean;
   // 是否开启布局支持
   enableLayout: boolean;
   // 是否关闭脏矩形检测
@@ -103,6 +105,8 @@ export type IOptimizeType = {
   // 不存在dirtyBounds的时候，根据该配置判断是否关闭图元的超出边界判定
   // 如果有dirtyBounds那么该配置不生效
   disableCheckGraphicWidthOutRange?: boolean;
+  // tick渲染模式，effect会在tick之后立刻执行render，保证动画效果正常。performance模式中tick和render均是RAF，属性可能会被篡改
+  tickRenderMode?: 'effect' | 'performance';
 };
 
 export interface IOption3D {
@@ -162,7 +166,7 @@ export interface IStage extends INode {
   ticker: ITicker;
   increaseAutoRender: boolean;
   readonly renderService: IRenderService;
-  pickerService?: IPickerService;
+  getPickerService: () => IPickerService;
   readonly pluginService: IPluginService;
   readonly layerService: ILayerService;
   // 如果传入CanvasId，如果存在相同Id，说明这两个图层使用相同的Canvas绘制
@@ -227,13 +231,15 @@ export interface IStage extends INode {
   release: () => void;
   setStage: (stage?: IStage) => void;
 
-  pauseRender: () => void;
+  pauseRender: (sk?: number) => void;
   resumeRender: () => void;
 
   setCursor: (mode?: string) => void;
 
   getTheme: () => IFullThemeSpec;
   eventPointTransform: (e: PointerEvent | WheelEvent | TouchEvent) => { x: number; y: number };
+  pauseTriggerEvent: () => void;
+  resumeTriggerEvent: () => void;
 }
 
 export declare function combineStage(srages: IStage[], params: { canvas: string | HTMLCanvasElement }): IStage;
